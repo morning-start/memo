@@ -1,6 +1,6 @@
 import 'dart:convert';
 import 'package:uuid/uuid.dart';
-import '../tools/model.dart';
+import '../tools/db_seeder.dart';
 
 class Countdown {
   final String id; // 唯一标识符

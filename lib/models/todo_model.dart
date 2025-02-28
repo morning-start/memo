@@ -1,6 +1,6 @@
 import 'dart:convert';
 
-import '../tools/model.dart';
+import '../tools/db_seeder.dart';
 import 'package:uuid/uuid.dart';
 
 /// 表示一个待办事项的类
@@ -24,7 +24,7 @@ class Todo {
   }) : id = id ?? Uuid().v4(); // 如果 id 为空，则生成新的 id
 
   // 表名常量
-  static const String _tableName = 'todos';
+  static const String tableName = 'todos';
 
   // 列定义
   static final Map<String, String> _columns = {
@@ -35,7 +35,7 @@ class Todo {
   };
 
   // 生成 CREATE TABLE 语句
-  String get toSqlCreateTable => sqlCreateTable(_tableName, _columns);
+  static String get toSqlCreateTable => sqlCreateTable(tableName, _columns);
 
   /// 将当前对象转换为Map类型，以便于存储或传输
   ///
