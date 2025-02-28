@@ -24,7 +24,7 @@ class TodoListScreen extends ConsumerWidget {
               todo.title,
               style: TextStyle(
                 decoration:
-                    todo.isCompleted? TextDecoration.lineThrough : null,
+                    todo.isCompleted ? TextDecoration.lineThrough : null,
               ),
             ),
             subtitle: Text(
@@ -42,80 +42,25 @@ class TodoListScreen extends ConsumerWidget {
                 todoListNotifier.removeTodo(todo.id);
               },
             ),
+            onTap: () async {
+              // 显示对话框以修改待办事项
+              final result = await _showTodoDialog(context, todo.title, todo.deadline);
+              if (result != null) {
+                todoListNotifier.updateTodo(
+                  todo.id,
+                  result['title'] as String,
+                  result['deadline'] as DateTime,
+                );
+              }
+            },
           );
         },
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: () async {
-          final result = await showDialog<Map<String, dynamic>>(
-            context: context,
-            builder: (context) {
-              String title = '';
-              DateTime deadline = DateTime.now().add(const Duration(days: 1));
-
-              return AlertDialog(
-                title: const Text('添加待办'),
-                content: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    TextField(
-                      onChanged: (value) {
-                        title = value;
-                      },
-                      decoration: const InputDecoration(
-                        hintText: '输入待办事项',
-                      ),
-                    ),
-                    const SizedBox(height: 10),
-                    ElevatedButton(
-                      onPressed: () async {
-                        final pickedDate = await showDatePicker(
-                          context: context,
-                          initialDate: deadline,
-                          firstDate: DateTime.now(),
-                          lastDate: DateTime(2100),
-                        );
-                        if (pickedDate!= null) {
-                          final pickedTime = await showTimePicker(
-                            context: context,
-                            initialTime: TimeOfDay.fromDateTime(deadline),
-                          );
-                          if (pickedTime!= null) {
-                            deadline = DateTime(
-                              pickedDate.year,
-                              pickedDate.month,
-                              pickedDate.day,
-                              pickedTime.hour,
-                              pickedTime.minute,
-                            );
-                          }
-                        }
-                      },
-                      child: const Text('选择截止时间'),
-                    ),
-                  ],
-                ),
-                actions: [
-                  TextButton(
-                    onPressed: () {
-                      Navigator.pop(context);
-                    },
-                    child: const Text('取消'),
-                  ),
-                  TextButton(
-                    onPressed: () {
-                      Navigator.pop(context, {
-                        'title': title,
-                        'deadline': deadline,
-                      });
-                    },
-                    child: const Text('添加'),
-                  ),
-                ],
-              );
-            },
-          );
-          if (result!= null) {
+          // 显示对话框以添加新的待办事项
+          final result = await _showTodoDialog(context, '', DateTime.now().add(const Duration(days: 1)));
+          if (result != null) {
             todoListNotifier.addTodo(
               result['title'] as String,
               result['deadline'] as DateTime,
@@ -125,5 +70,87 @@ class TodoListScreen extends ConsumerWidget {
         child: const Icon(Icons.add),
       ),
     );
+  }
+
+  Future<Map<String, dynamic>?> _showTodoDialog(BuildContext context, String initialTitle, DateTime initialDeadline) async {
+    String title = initialTitle;
+    DateTime deadline = initialDeadline;
+
+    return showDialog<Map<String, dynamic>>(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          title: Text(initialTitle.isEmpty ? '添加待办' : '修改待办'),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              TextField(
+                controller: TextEditingController(text: initialTitle),
+                onChanged: (value) {
+                  title = value;
+                },
+                decoration: InputDecoration(
+                  hintText: '输入待办事项',
+                  labelText: '标题',
+                ),
+              ),
+              const SizedBox(height: 10),
+              ElevatedButton(
+                onPressed: () async {
+                  // 显示日期和时间选择器
+                  final pickedDateTime = await _pickDateTime(context, deadline);
+                  if (pickedDateTime != null) {
+                    deadline = pickedDateTime;
+                  }
+                },
+                child: const Text('选择截止时间'),
+              ),
+            ],
+          ),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.pop(context);
+              },
+              child: const Text('取消'),
+            ),
+            TextButton(
+              onPressed: () {
+                Navigator.pop(context, {
+                  'title': title,
+                  'deadline': deadline,
+                });
+              },
+              child: Text(initialTitle.isEmpty ? '添加' : '保存'),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  Future<DateTime?> _pickDateTime(BuildContext context, DateTime initialDateTime) async {
+    final pickedDate = await showDatePicker(
+      context: context,
+      initialDate: initialDateTime,
+      firstDate: DateTime.now(),
+      lastDate: DateTime(2100),
+    );
+    if (pickedDate != null) {
+      final pickedTime = await showTimePicker(
+        context: context,
+        initialTime: TimeOfDay.fromDateTime(initialDateTime),
+      );
+      if (pickedTime != null) {
+        return DateTime(
+          pickedDate.year,
+          pickedDate.month,
+          pickedDate.day,
+          pickedTime.hour,
+          pickedTime.minute,
+        );
+      }
+    }
+    return null;
   }
 }
