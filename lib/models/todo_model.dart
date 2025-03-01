@@ -10,9 +10,9 @@ class Todo {
   // 唯一标识符
   final String id;
   // 标题
-  final String title;
+  String title;
   // 截止日期
-  final DateTime deadline;
+  DateTime deadline;
   // 完成状态
   bool isCompleted;
 
@@ -53,6 +53,15 @@ class Todo {
     };
   }
 
+  void changeStatus() {
+    isCompleted = !isCompleted;
+  }
+
+  void update(String newTitle, DateTime newDeadline) {
+    title = newTitle;
+    deadline = newDeadline;
+  }
+
   /// 根据一个Map对象创建一个新的Todo实例。
   ///
   /// 此工厂构造函数用于将一个包含待办事项数据的Map转换为Todo对象。
@@ -73,10 +82,10 @@ class Todo {
   }
 
   /// 将对象转换为JSON字符串
-  /// 
+  ///
   /// 此方法用于序列化对象，使其可以轻松地存储或传输
   /// 它首先将对象转换为Map，然后将该Map转换为JSON字符串
-  /// 
+  ///
   /// 返回: 对象的JSON字符串表示
   String toJson() {
     return jsonEncode(toMap());

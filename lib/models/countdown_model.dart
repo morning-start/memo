@@ -4,53 +4,65 @@ import '../tools/db_seeder.dart';
 
 class Countdown {
   final String id; // 唯一标识符
-  final String title; // 任务标题
-  final DateTime? deadline; // 截止日期
-  final bool isRecurring; // 是否重复
-  final Duration? duration; // 重复间隔时长
+  String title; // 任务标题
+  DateTime startTime; // 任务开始时间
+  Duration duration; // 重复间隔时长
+  bool isRecurring; // 是否重复
+  bool isCompleted; // 任务是否完成
 
   // 表名常量
-  static const String _tableName = 'countdowns';
+  static const String tableName = 'countdowns';
 
   // 列定义
   static final Map<String, String> _columns = {
     'id': 'TEXT PRIMARY KEY',
     'title': 'TEXT',
-    'deadline': 'TEXT',
+    'startTime': 'TEXT',
+    'duration': 'INTEGER',
     'isRecurring': 'INTEGER',
-    'duration': 'INTEGER'
+    'isCompleted': 'INTEGER',
   };
 
   // 构造函数，初始化任务对象
   Countdown({
     String? id,
     required this.title,
-    this.deadline,
+    required this.startTime,
+    required this.duration,
     this.isRecurring = false,
-    this.duration = const Duration(days: 0),
-  }) : id = id ?? const Uuid().v4() {
-    // 如果任务不是重复的且没有截止日期，则抛出异常
-    if (!isRecurring && deadline == null) {
-      throw ArgumentError(
-          'If isRecurring is false, deadline must be provided.');
-    }
-    // 如果任务是重复的且没有重复间隔时长，则抛出异常
-    if (isRecurring && duration == null) {
-      throw ArgumentError('If isRecurring is true, duration must be provided.');
-    }
-  }
+    this.isCompleted = false,
+  }) : id = id ?? const Uuid().v4();
 
   // 生成 CREATE TABLE 语句
-  String get toSqlCreateTable => sqlCreateTable(_tableName, _columns);
+  static String get toSqlCreateTable => sqlCreateTable(tableName, _columns);
+
+  // 重启任务
+  void restart() {
+    isCompleted = false;
+    startTime = DateTime.now();
+  }
+
+  void changeStatus() {
+    isCompleted = !isCompleted;
+  }
+
+  void update(String newTitle, DateTime newStartTime, Duration newDuration,
+      bool newIsRecurring) {
+    title = newTitle;
+    startTime = newStartTime;
+    duration = newDuration;
+    isRecurring = newIsRecurring;
+  }
 
   /// 将当前对象转换为Map类型，以便于存储或传输
   Map<String, dynamic> toMap() {
     return {
       'id': id,
       'title': title,
-      'deadline': deadline?.toIso8601String(),
+      'startTime': startTime.toIso8601String(),
+      'duration': duration.inDays,
       'isRecurring': isRecurring ? 1 : 0,
-      'duration': duration?.inSeconds,
+      'isCompleted': isCompleted ? 1 : 0,
     };
   }
 
@@ -59,9 +71,10 @@ class Countdown {
     return Countdown(
       id: map['id'],
       title: map['title'],
-      deadline: map['deadline'] != null ? DateTime.parse(map['deadline']) : null,
+      startTime: DateTime.parse(map['startTime']),
+      duration: Duration(seconds: map['duration']),
       isRecurring: map['isRecurring'] == 1,
-      duration: map['duration'] != null ? Duration(seconds: map['duration']) : null,
+      isCompleted: map['isCompleted'] == 1,
     );
   }
 
