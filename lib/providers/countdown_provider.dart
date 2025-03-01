@@ -10,6 +10,9 @@ class CountdownNotifier extends StateNotifier<List<Countdown>> {
     _initializeDatabase();
   }
 
+  /// 初始化数据库并加载任务。
+  ///
+  /// 此方法会在初始化时被调用，用于设置数据库连接并加载已有的倒计时任务。
   Future<void> _initializeDatabase() async {
     _db = await initializeDatabase(Countdown.toSqlCreateTable);
 
@@ -25,6 +28,10 @@ class CountdownNotifier extends StateNotifier<List<Countdown>> {
     });
   }
 
+  /// 添加一个新的倒计时任务。
+  ///
+  /// 参数:
+  ///   - task: 要添加的倒计时任务对象。
   Future<void> addTask(Countdown task) async {
     await _db.insert(
       Countdown.tableName,
@@ -35,6 +42,10 @@ class CountdownNotifier extends StateNotifier<List<Countdown>> {
     state = [...state, task];
   }
 
+  /// 根据ID移除一个倒计时任务。
+  ///
+  /// 参数:
+  ///   - id: 要移除的任务的ID。
   Future<void> removeTask(String id) async {
     await _db.delete(
       Countdown.tableName,
@@ -45,6 +56,12 @@ class CountdownNotifier extends StateNotifier<List<Countdown>> {
     state = state.where((task) => task.id != id).toList();
   }
 
+  /// 根据ID切换一个倒计时任务的状态。
+  ///
+  /// 如果任务已完成且是循环任务，则会重新开始。
+  ///
+  /// 参数:
+  ///   - id: 要切换状态的任务的ID。
   Future<void> toggleTask(String id) async {
     final updatedTask = state.firstWhere((task) => task.id == id);
     updatedTask.changeStatus();
@@ -60,6 +77,14 @@ class CountdownNotifier extends StateNotifier<List<Countdown>> {
     state = state.map((task) => task.id == id ? updatedTask : task).toList();
   }
 
+  /// 根据ID更新一个倒计时任务的详细信息。
+  ///
+  /// 参数:
+  ///   - id: 要更新的任务的ID。
+  ///   - newTitle: 新的任务标题。
+  ///   - newStartTime: 新的任务开始时间。
+  ///   - newDuration: 新的任务持续时间。
+  ///   - newIsRecurring: 新的任务是否为循环任务。
   Future<void> updateTask(String id, String newTitle, DateTime newStartTime,
       Duration newDuration, bool newIsRecurring) async {
     final updatedTask = state.firstWhere((task) => task.id == id);
