@@ -14,8 +14,7 @@ class CountdownNotifier extends StateNotifier<List<Countdown>> {
   ///
   /// 此方法会在初始化时被调用，用于设置数据库连接并加载已有的倒计时任务。
   Future<void> _initializeDatabase() async {
-    _db = await initializeDatabase(Countdown.toSqlCreateTable);
-
+    _db = await openTable(Countdown.sql);
     await _loadTasks();
   }
 

@@ -8,11 +8,12 @@ class TodoListNotifier extends StateNotifier<List<Todo>> {
 
   TodoListNotifier() : super([]) {
     _initializeDatabase();
+    _loadTodos();
   }
 
   Future<void> _initializeDatabase() async {
-    _db = await initializeDatabase(Todo.toSqlCreateTable);
-    _loadTodos();
+    _db = await openTable(Todo.sql);
+    await _loadTodos();
   }
 
   Future<void> _loadTodos() async {
@@ -44,7 +45,7 @@ class TodoListNotifier extends StateNotifier<List<Todo>> {
   Future<void> toggleTodo(String id) async {
     final updatedTodo = state.firstWhere((todo) => todo.id == id);
     updatedTodo.changeStatus();
-    
+
     await _db.update(
       Todo.tableName,
       updatedTodo.toMap(),

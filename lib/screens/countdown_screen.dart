@@ -1,44 +1,46 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:pull_to_refresh/pull_to_refresh.dart'; // 引入refresher库
-import '../providers/todo_provider.dart';
+import '../providers/countdown_provider.dart';
 
 class CountdownScreen extends ConsumerWidget {
   const CountdownScreen({super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final todos = ref.watch(todoListProvider);
-    final refreshController = RefreshController(); // 添加RefreshController
+    final countdowns = ref.watch(countdownProvider);
+    final countdownNotifier = ref.read(countdownProvider.notifier);
 
     return Scaffold(
       appBar: AppBar(
         title: const Text('倒计时'),
       ),
-      body: SmartRefresher(
-        // 使用SmartRefresher包裹ListView.builder
-        controller: refreshController,
-        onRefresh: () async {
-          // 刷新逻辑，这里假设刷新时重新加载数据
-          // ignore: unused_result
-          ref.refresh(todoListProvider);
-          refreshController.refreshCompleted();
-        },
-        child: ListView.builder(
-          itemCount: todos.length,
+      body: ListView.builder(
+          itemCount: countdowns.length,
           itemBuilder: (context, index) {
-            final todo = todos[index];
-            final remaining = todo.deadline.difference(DateTime.now());
-
+            final countdown = countdowns[index];
             return ListTile(
-              title: Text(todo.title),
-              subtitle: Text(
-                '剩余时间: ${remaining.inDays} 天 ${remaining.inHours % 24} 小时 ${remaining.inMinutes % 60} 分钟',
+              title: Text(
+                countdown.title,
+                style: TextStyle(
+                  decoration:
+                      countdown.isCompleted ? TextDecoration.lineThrough : null,
+                ),
+              ),
+              // subtitle: ,
+              leading: Checkbox(
+                  value: countdown.isCompleted,
+                  onChanged: (val) {
+                    countdownNotifier.toggleTask(countdown.id);
+                  }),
+              trailing: IconButton(
+                icon: const Icon(Icons.delete),
+                onPressed: () {
+                  countdownNotifier.removeTask(countdown.id);
+                },
               ),
             );
-          },
-        ),
-      ),
+          }),
     );
   }
 }

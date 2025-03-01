@@ -1,10 +1,24 @@
+import 'dart:developer';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'screens/todo_list_screen.dart';
-import 'screens/countdown_screen.dart';
-import 'screens/settings_screen.dart';
+import 'tools/db_seeder.dart'; // 导入 db_seeder.dart 文件
+import 'models/todo_model.dart'; // 确保 Todo 模型可用
+import 'models/countdown_model.dart';
+import 'package:path/path.dart';
+import 'package:sqflite/sqflite.dart';
+import 'utils/route.dart';
 
-void main() {
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized(); // 确保 Flutter 框架初始化完成
+  await initializeDatabase([Todo.sql, Countdown.sql]); // 初始化数据库并创建所需的表
+  log('数据库初始化完成');
+  // log 数据库中所有表名
+  await openDatabase(join(await getDatabasesPath(), dbName)).then((db) async {
+    final tables = await db.rawQuery('SELECT name FROM sqlite_master WHERE type="table"');
+    log('数据库中的表：${tables.map((row) => row['name']).join(', ')}');
+  });
+
+
   runApp(const ProviderScope(child: MyApp()));
 }
 
@@ -32,17 +46,10 @@ class MainScreen extends StatefulWidget {
 
 class _MainScreenState extends State<MainScreen> {
   int _currentIndex = 0;
-
-  final List<Widget> _screens = [
-    const TodoListScreen(),
-    const CountdownScreen(),
-    const SettingsScreen(),
-  ];
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: _screens[_currentIndex],
+      body: route[_currentIndex].screen,
       bottomNavigationBar: BottomNavigationBar(
         currentIndex: _currentIndex,
         onTap: (index) {
@@ -50,20 +57,7 @@ class _MainScreenState extends State<MainScreen> {
             _currentIndex = index;
           });
         },
-        items: const [
-          BottomNavigationBarItem(
-            icon: Icon(Icons.list),
-            label: '待办列表',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.timer),
-            label: '倒计时列表',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.settings),
-            label: '设置',
-          ),
-        ],
+        items: route.map((group) => group.item).toList(),
       ),
     );
   }

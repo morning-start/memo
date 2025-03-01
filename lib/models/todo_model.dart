@@ -35,7 +35,7 @@ class Todo {
   };
 
   // 生成 CREATE TABLE 语句
-  static String get toSqlCreateTable => sqlCreateTable(tableName, _columns);
+  static String get sql => sqlCreateTable(tableName, _columns);
 
   /// 将当前对象转换为Map类型，以便于存储或传输
   ///

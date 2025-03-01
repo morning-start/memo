@@ -18,11 +18,11 @@ class Countdown {
 
   static final Map<String, String> _columns = {
     'id': 'TEXT PRIMARY KEY',
-    'title': 'TEXT',
-    'startTime': 'TEXT',
-    'duration': 'INTEGER',
-    'isRecurring': 'INTEGER',
-    'isCompleted': 'INTEGER',
+    'title': 'TEXT NOT NULL',
+    'startTime': 'TEXT NOT NULL',
+    'duration': 'INTEGER NOT NULL',
+    'isRecurring': 'INTEGER NOT NULL',
+    'isCompleted': 'INTEGER NOT NULL',
   };
 
   Countdown({
@@ -38,7 +38,7 @@ class Countdown {
   ///
   /// 返回一个SQL语句，用于创建名为'countdowns'的表，包含指定的列。
   /// 列包括'id'、'title'、'startTime'、'duration'、'isRecurring'和'isCompleted'。
-  static String get toSqlCreateTable => sqlCreateTable(tableName, _columns);
+  static String get sql => sqlCreateTable(tableName, _columns);
 
   /// 重启倒计时任务。
   ///
