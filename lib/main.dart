@@ -49,7 +49,7 @@ class _MainScreenState extends State<MainScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: route[_currentIndex].screen,
+      body: routes[_currentIndex].screen,
       bottomNavigationBar: BottomNavigationBar(
         currentIndex: _currentIndex,
         onTap: (index) {
@@ -57,7 +57,7 @@ class _MainScreenState extends State<MainScreen> {
             _currentIndex = index;
           });
         },
-        items: route.map((group) => group.item).toList(),
+        items: routes.map((group) => group.item).toList(),
       ),
     );
   }
