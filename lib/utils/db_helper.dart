@@ -1,7 +1,9 @@
 import 'package:path/path.dart';
 import 'package:sqflite/sqflite.dart';
-import '../models/todo_model.dart';
-import '../models/countdown_model.dart';
+
+import 'package:memo/models/countdown_model.dart';
+import 'package:memo/models/todo_model.dart';
+
 
 class DatabaseHelper {
   final String _dbName = 'memo.db';
@@ -41,21 +43,17 @@ class DatabaseHelper {
     );
   }
 
-  Future<Database> openTable(String sql) async {
-    return await openDatabase(
-      join(await getDatabasesPath(), _dbName),
-      onCreate: (db, version) async {
-        await db.execute(sql);
-      },
-      version: _dbVersion,
-    );
-  }
-
+  /// 关闭数据库连接。
   Future<void> close() async {
     final db = await _instance.db;
     await db.close();
   }
 
+  /// 向指定表中插入一行数据。
+  ///
+  /// 参数：
+  ///   - table - 表名。
+  ///   - row - 要插入的数据行，键值对形式。
   Future<void> insert(String table, Map<String, dynamic> row) async {
     final db = await _instance.db;
     await db.insert(
@@ -65,8 +63,21 @@ class DatabaseHelper {
     );
   }
 
+  /// 查询指定表中的数据。
+  ///
+  /// 参数：
+  ///   - table - 表名。
+  ///   - distinct - 是否返回唯一值。
+  ///   - columns - 要查询的列。
+  ///   - where - 查询条件。
+  ///   - whereArgs - 查询条件中的参数。
+  ///   - groupBy - 分组条件。
+  ///   - having - 分组条件中的过滤条件。
+  ///   - orderBy - 排序条件。
+  ///   - limit - 返回的最大行数。
+  ///   - offset - 跳过的行数。
   Future<List<Map<String, dynamic>>> query(
-    String table,
+    String table, {
     bool? distinct,
     List<String>? columns,
     String? where,
@@ -76,7 +87,7 @@ class DatabaseHelper {
     String? orderBy,
     int? limit,
     int? offset,
-  ) async {
+  }) async {
     final db = await _instance.db;
     return await db.query(table,
         distinct: distinct,
@@ -90,6 +101,14 @@ class DatabaseHelper {
         offset: offset);
   }
 
+  /// 更新指定表中的数据。
+  ///
+  /// 参数：
+  ///   - table - 表名。
+  ///   - values - 要更新的数据，键值对形式。
+  ///   - where - 更新条件。
+  ///   - whereArgs - 更新条件中的参数。
+  ///   - conflictAlgorithm - 冲突解决算法。
   Future<int> update(
     String table,
     Map<String, Object?> values, {
@@ -107,6 +126,12 @@ class DatabaseHelper {
     );
   }
 
+  /// 删除指定表中的数据。
+  ///
+  /// 参数：
+  ///   - table - 表名。
+  ///   - where - 删除条件。
+  ///   - whereArgs - 删除条件中的参数。
   Future<int> delete(
     String table, {
     String? where,
