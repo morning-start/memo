@@ -8,9 +8,11 @@ abstract class BaseNotifier<T extends BaseModel>
   late DatabaseHelper _db;
   final String tableName;
 
-  BaseNotifier(this.tableName) : super([]);
+  BaseNotifier(this.tableName) : super([]) {
+    _initializeDatabase();
+  }
 
-  Future<void> initializeDatabase() async {
+  Future<void> _initializeDatabase() async {
     _db = DatabaseHelper();
     await _loadTasks();
   }

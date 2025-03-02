@@ -43,9 +43,9 @@ class TodoListNotifier extends BaseNotifier<Todo> {
   ///   - newDeadline: 任务的新截止日期。
   Future<void> updateTodo(
       String id, String newTitle, DateTime newDeadline) async {
-    final updatedTodo = state.firstWhere((todo) => todo.id == id);
-    updatedTodo.update(newTitle, newDeadline);
-    await super.updateTask(id, updatedTodo);
+    final tmp = state.firstWhere((todo) => todo.id == id);
+    tmp.update(newTitle, newDeadline);
+    await super.updateTask(id, tmp);
   }
 }
 

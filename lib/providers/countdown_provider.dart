@@ -9,16 +9,16 @@ class CountdownNotifier extends BaseNotifier<Countdown> {
   /// 添加一个新的倒计时任务。
   ///
   /// 参数:
-  ///   - task: 要添加的倒计时任务对象。
-  Future<void> addCutdown(Countdown task) async {
-    await super.addTask(task);
+  ///   - countdown: 要添加的倒计时任务对象。
+  Future<void> addCountdown(Countdown countdown) async {
+    await super.addTask(countdown);
   }
   
   /// 切换指定ID的任务的完成状态。
   ///
   /// 参数:
   ///   - id: 要切换完成状态的任务的ID。
-  Future<void> toggleCutdown(String id) async {
+  Future<void> toggleCountdown(String id) async {
     await toggleTask(id);
   }
 
@@ -26,7 +26,7 @@ class CountdownNotifier extends BaseNotifier<Countdown> {
   ///
   /// 参数:
   ///   - id: 要移除的任务的ID。
-  Future<void> removeCutdown(String id) async {
+  Future<void> removeCountdown(String id) async {
     await super.removeTask(id);
   }
 
@@ -39,11 +39,11 @@ class CountdownNotifier extends BaseNotifier<Countdown> {
   ///   - newStartTime: 新的任务开始时间。
   ///   - newDuration: 新的任务持续时间。
   ///   - newIsRecurring: 新的任务是否为循环任务。
-  Future<void> updateCutdown(String id, String newTitle, DateTime newStartTime,
+  Future<void> updateCountdown(String id, String newTitle, DateTime newStartTime,
       Duration newDuration, bool newIsRecurring) async {
-    final updatedTask = state.firstWhere((task) => task.id == id);
-    updatedTask.update(newTitle, newStartTime, newDuration, newIsRecurring);
-    await super.updateTask(id, updatedTask);
+    final tmp = state.firstWhere((countdown) => countdown.id == id);
+    tmp.update(newTitle, newStartTime, newDuration, newIsRecurring);
+    await super.updateTask(id, tmp);
   }
 }
 
