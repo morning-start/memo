@@ -1,10 +1,10 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:memo/tools/db_seeder.dart';
-import '../models/countdown_model.dart';
-import 'package:sqflite/sqflite.dart';
+
+import 'package:memo/models/countdown_model.dart';
+import 'package:memo/utils/db_helper.dart';
 
 class CountdownNotifier extends StateNotifier<List<Countdown>> {
-  late Database _db;
+  late DatabaseHelper _db;
 
   CountdownNotifier() : super([]) {
     _initializeDatabase();
@@ -14,13 +14,13 @@ class CountdownNotifier extends StateNotifier<List<Countdown>> {
   ///
   /// 此方法会在初始化时被调用，用于设置数据库连接并加载已有的倒计时任务。
   Future<void> _initializeDatabase() async {
-    _db = await openTable(Countdown.sql);
+    _db = DatabaseHelper(); // 使用DatabaseHelper实例
     await _loadTasks();
   }
 
   Future<void> _loadTasks() async {
     final List<Map<String, dynamic>> maps =
-        await _db.query(Countdown.tableName);
+        await _db.query(Countdown.tableName); // 使用DatabaseHelper查询
 
     state = List.generate(maps.length, (i) {
       return Countdown.fromMap(maps[i]);
@@ -35,8 +35,7 @@ class CountdownNotifier extends StateNotifier<List<Countdown>> {
     await _db.insert(
       Countdown.tableName,
       task.toMap(),
-      conflictAlgorithm: ConflictAlgorithm.replace,
-    );
+    ); // 使用DatabaseHelper插入
 
     state = [...state, task];
   }
@@ -50,7 +49,7 @@ class CountdownNotifier extends StateNotifier<List<Countdown>> {
       Countdown.tableName,
       where: 'id = ?',
       whereArgs: [id],
-    );
+    ); // 使用DatabaseHelper删除
 
     state = state.where((task) => task.id != id).toList();
   }
@@ -72,7 +71,8 @@ class CountdownNotifier extends StateNotifier<List<Countdown>> {
       updatedTask.toMap(),
       where: 'id = ?',
       whereArgs: [id],
-    );
+    ); // 使用DatabaseHelper更新
+
     state = state.map((task) => task.id == id ? updatedTask : task).toList();
   }
 
@@ -93,7 +93,7 @@ class CountdownNotifier extends StateNotifier<List<Countdown>> {
       updatedTask.toMap(),
       where: 'id = ?',
       whereArgs: [id],
-    );
+    ); // 使用DatabaseHelper更新
 
     state = state.map((task) => task.id == id ? updatedTask : task).toList();
   }

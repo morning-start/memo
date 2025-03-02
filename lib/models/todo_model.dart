@@ -1,7 +1,8 @@
 import 'dart:convert';
 
-import '../tools/db_seeder.dart';
 import 'package:uuid/uuid.dart';
+
+import 'package:memo/func/db_seeder.dart';
 
 /// 表示一个待办事项的类
 /// 包含唯一标识符、标题、截止日期和完成状态

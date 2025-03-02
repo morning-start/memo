@@ -1,10 +1,10 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import '../models/todo_model.dart';
-import 'package:sqflite/sqflite.dart';
-import '../tools/db_seeder.dart';
+
+import 'package:memo/models/todo_model.dart';
+import 'package:memo/utils/db_helper.dart';
 
 class TodoListNotifier extends StateNotifier<List<Todo>> {
-  late Database _db;
+  late DatabaseHelper _db;
 
   TodoListNotifier() : super([]) {
     _initializeDatabase();
@@ -12,7 +12,7 @@ class TodoListNotifier extends StateNotifier<List<Todo>> {
   }
 
   Future<void> _initializeDatabase() async {
-    _db = await openTable(Todo.sql);
+    _db = DatabaseHelper();
     await _loadTodos();
   }
 
@@ -33,7 +33,6 @@ class TodoListNotifier extends StateNotifier<List<Todo>> {
     await _db.insert(
       Todo.tableName,
       newTodo.toMap(),
-      conflictAlgorithm: ConflictAlgorithm.replace,
     );
     state = [...state, newTodo];
   }

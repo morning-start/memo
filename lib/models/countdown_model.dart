@@ -1,6 +1,9 @@
 import 'dart:convert';
+
 import 'package:uuid/uuid.dart';
-import '../tools/db_seeder.dart';
+
+import 'package:memo/func/db_seeder.dart';
+
 
 /// 表示一个倒计时任务的类。
 ///
