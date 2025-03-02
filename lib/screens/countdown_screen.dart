@@ -1,10 +1,9 @@
 import 'package:flutter/material.dart';
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:pull_to_refresh/pull_to_refresh.dart'; // 引入refresher库
-import 'package:memo/widgets/list_view.dart';
 
 import 'package:memo/providers/countdown_provider.dart';
+import 'package:memo/widgets/list_view.dart';
 
 class CountdownScreen extends ConsumerWidget {
   const CountdownScreen({super.key});
