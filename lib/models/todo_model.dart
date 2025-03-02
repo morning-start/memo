@@ -1,28 +1,17 @@
-import 'dart:convert';
-
-import 'package:uuid/uuid.dart';
-
-import 'package:memo/func/db_seeder.dart';
+import 'package:memo/models/base_model.dart';
 
 /// 表示一个待办事项的类
 /// 包含唯一标识符、标题、截止日期和完成状态
 
-class Todo {
-  // 唯一标识符
-  final String id;
-  // 标题
-  String title;
-  // 截止日期
+class Todo extends BaseModel {
   DateTime deadline;
-  // 完成状态
-  bool isCompleted;
 
   Todo({
     String? id,
-    required this.title,
+    required String title,
     required this.deadline,
-    this.isCompleted = false,
-  }) : id = id ?? Uuid().v4(); // 如果 id 为空，则生成新的 id
+    bool isCompleted = false,
+  }) : super(id: id, title: title, isCompleted: isCompleted);
 
   // 表名常量
   static const String tableName = 'todos';
@@ -36,7 +25,7 @@ class Todo {
   };
 
   // 生成 CREATE TABLE 语句
-  static String get sql => sqlCreateTable(tableName, _columns);
+  static String get sql => BaseModel.sqlCreateTable(tableName, _columns);
 
   /// 将当前对象转换为Map类型，以便于存储或传输
   ///
@@ -52,10 +41,6 @@ class Todo {
       'deadline': deadline.toIso8601String(),
       'isCompleted': isCompleted ? 1 : 0,
     };
-  }
-
-  void changeStatus() {
-    isCompleted = !isCompleted;
   }
 
   void update(String newTitle, DateTime newDeadline) {
@@ -80,29 +65,5 @@ class Todo {
       deadline: DateTime.parse(map['deadline']),
       isCompleted: map['isCompleted'] == 1,
     );
-  }
-
-  /// 将对象转换为JSON字符串
-  ///
-  /// 此方法用于序列化对象，使其可以轻松地存储或传输
-  /// 它首先将对象转换为Map，然后将该Map转换为JSON字符串
-  ///
-  /// 返回: 对象的JSON字符串表示
-  String toJson() {
-    return jsonEncode(toMap());
-  }
-
-  /// 创建一个Todo对象的工厂构造函数
-  ///
-  /// 此构造函数接受一个JSON字符串作为输入，并将其解析为一个Todo对象
-  /// 它首先将JSON字符串解码为一个Dart的Map对象，然后调用Todo.fromMap工厂构造函数
-  /// 来创建并返回一个Todo对象
-  factory Todo.fromJson(String jsonString) {
-    // 将JSON字符串解码为一个Dart的Map对象
-    final Map<String, dynamic> json =
-        Map<String, dynamic>.from(jsonDecode(jsonString));
-
-    // 使用解码后的Map对象来创建并返回一个Todo对象
-    return Todo.fromMap(json);
   }
 }

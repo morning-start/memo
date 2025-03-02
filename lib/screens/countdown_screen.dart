@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:pull_to_refresh/pull_to_refresh.dart'; // 引入refresher库
 import '../providers/countdown_provider.dart';
@@ -41,6 +42,12 @@ class CountdownScreen extends ConsumerWidget {
               ),
             );
           }),
+      floatingActionButton: FloatingActionButton(
+        onPressed: () async {
+          // 显示对话框以添加新的待办事项
+        },
+        child: const Icon(Icons.add),
+      ),
     );
   }
 }

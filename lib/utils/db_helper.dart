@@ -4,7 +4,6 @@ import 'package:sqflite/sqflite.dart';
 import 'package:memo/models/countdown_model.dart';
 import 'package:memo/models/todo_model.dart';
 
-
 class DatabaseHelper {
   final String _dbName = 'memo.db';
   final int _dbVersion = 1;
@@ -38,6 +37,15 @@ class DatabaseHelper {
         for (var createSql in createSqlList) {
           await db.execute(createSql);
         }
+      },
+      onUpgrade: (db, oldVersion, newVersion) async {
+        // TODO: 升级数据库逻辑
+      },
+      onDowngrade: (db, oldVersion, newVersion) async {
+        // TODO: 降级数据库逻辑
+      },
+      onOpen: (db) async {
+        // TODO: 打开数据库逻辑
       },
       version: _dbVersion,
     );

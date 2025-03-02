@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
+
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
+
 import '../providers/todo_provider.dart';
 
 class TodoListScreen extends ConsumerWidget {
@@ -44,7 +46,8 @@ class TodoListScreen extends ConsumerWidget {
             ),
             onTap: () async {
               // 显示对话框以修改待办事项
-              final result = await _showTodoDialog(context, todo.title, todo.deadline);
+              final result =
+                  await _showTodoDialog(context, todo.title, todo.deadline);
               if (result != null) {
                 todoListNotifier.updateTodo(
                   todo.id,
@@ -59,7 +62,8 @@ class TodoListScreen extends ConsumerWidget {
       floatingActionButton: FloatingActionButton(
         onPressed: () async {
           // 显示对话框以添加新的待办事项
-          final result = await _showTodoDialog(context, '', DateTime.now().add(const Duration(days: 1)));
+          final result = await _showTodoDialog(
+              context, '', DateTime.now().add(const Duration(days: 1)));
           if (result != null) {
             todoListNotifier.addTodo(
               result['title'] as String,
@@ -72,7 +76,8 @@ class TodoListScreen extends ConsumerWidget {
     );
   }
 
-  Future<Map<String, dynamic>?> _showTodoDialog(BuildContext context, String initialTitle, DateTime initialDeadline) async {
+  Future<Map<String, dynamic>?> _showTodoDialog(BuildContext context,
+      String initialTitle, DateTime initialDeadline) async {
     String title = initialTitle;
     DateTime deadline = initialDeadline;
 
@@ -129,7 +134,8 @@ class TodoListScreen extends ConsumerWidget {
     );
   }
 
-  Future<DateTime?> _pickDateTime(BuildContext context, DateTime initialDateTime) async {
+  Future<DateTime?> _pickDateTime(
+      BuildContext context, DateTime initialDateTime) async {
     final pickedDate = await showDatePicker(
       context: context,
       initialDate: initialDateTime,
