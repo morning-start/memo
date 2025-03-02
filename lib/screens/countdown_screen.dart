@@ -32,12 +32,12 @@ class CountdownScreen extends ConsumerWidget {
               leading: Checkbox(
                   value: countdown.isCompleted,
                   onChanged: (val) {
-                    countdownNotifier.toggleTask(countdown.id);
+                    countdownNotifier.toggleCountdown(countdown.id);
                   }),
               trailing: IconButton(
                 icon: const Icon(Icons.delete),
                 onPressed: () {
-                  countdownNotifier.removeTask(countdown.id);
+                  countdownNotifier.removeCountdown(countdown.id);
                 },
               ),
             );

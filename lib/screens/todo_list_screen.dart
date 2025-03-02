@@ -3,6 +3,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
 
+import 'package:memo/widgets/list_view.dart';
+
 import '../providers/todo_provider.dart';
 
 class TodoListScreen extends ConsumerWidget {
@@ -17,46 +19,30 @@ class TodoListScreen extends ConsumerWidget {
       appBar: AppBar(
         title: const Text('待办列表'),
       ),
-      body: ListView.builder(
-        itemCount: todos.length,
-        itemBuilder: (context, index) {
-          final todo = todos[index];
-          return ListTile(
-            title: Text(
-              todo.title,
-              style: TextStyle(
-                decoration:
-                    todo.isCompleted ? TextDecoration.lineThrough : null,
-              ),
-            ),
-            subtitle: Text(
-              DateFormat('yyyy-MM-dd HH:mm').format(todo.deadline),
-            ),
-            leading: Checkbox(
-              value: todo.isCompleted,
-              onChanged: (value) {
-                todoListNotifier.toggleTodo(todo.id);
-              },
-            ),
-            trailing: IconButton(
-              icon: const Icon(Icons.delete),
-              onPressed: () {
-                todoListNotifier.removeTodo(todo.id);
-              },
-            ),
-            onTap: () async {
-              // 显示对话框以修改待办事项
-              final result =
-                  await _showTodoDialog(context, todo.title, todo.deadline);
-              if (result != null) {
-                todoListNotifier.updateTodo(
-                  todo.id,
-                  result['title'] as String,
-                  result['deadline'] as DateTime,
-                );
-              }
-            },
+      body: CustomListView(
+        items: todos,
+        subtitleBuilder: (todo) {
+          return Text(
+            DateFormat('yyyy-MM-dd HH:mm').format(todo.deadline),
           );
+        },
+        editFunc: (todo) async {
+          // 显示对话框以修改待办事项
+          final result =
+              await _showTodoDialog(context, todo.title, todo.deadline);
+          if (result != null) {
+            todoListNotifier.updateTodo(
+              todo.id,
+              result['title'] as String,
+              result['deadline'] as DateTime,
+            );
+          }
+        },
+        toggleFunc: (id) {
+          todoListNotifier.toggleTodo(id);
+        },
+        delFunc: (id) {
+          todoListNotifier.removeTodo(id);
         },
       ),
       floatingActionButton: FloatingActionButton(
