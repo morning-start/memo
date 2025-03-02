@@ -2,17 +2,17 @@ import 'package:flutter/material.dart';
 
 import 'package:memo/models/base_model.dart';
 
-class CustomListView<T extends BaseModel> extends StatelessWidget {
+class TaskListView<T extends BaseModel> extends StatelessWidget {
   final List<T> items;
-  final Widget Function(T task) subtitleBuilder;
+  final Widget Function(T task)? subtitleBuilder;
   final void Function(T task) editFunc;
   final void Function(String id) toggleFunc;
   final void Function(String id) delFunc;
 
-  const CustomListView({
+  const TaskListView({
     super.key,
     required this.items,
-    required this.subtitleBuilder,
+    this.subtitleBuilder,
     required this.editFunc,
     required this.toggleFunc, // 增加toggleFunc参数
     required this.delFunc, // 增加delFunc参数
@@ -25,11 +25,13 @@ class CustomListView<T extends BaseModel> extends StatelessWidget {
       itemBuilder: (context, index) {
         final item = items[index];
         return ListTile(
-          title: Text(item.title,style: TextStyle(
-                decoration:
-                    item.isCompleted ? TextDecoration.lineThrough : null,
-              ),),
-          subtitle: subtitleBuilder(item),
+          title: Text(
+            item.title,
+            style: TextStyle(
+              decoration: item.isCompleted ? TextDecoration.lineThrough : null,
+            ),
+          ),
+          subtitle: subtitleBuilder != null ? subtitleBuilder!(item) : null,
           leading: Checkbox(
             value: item.isCompleted,
             onChanged: (value) {

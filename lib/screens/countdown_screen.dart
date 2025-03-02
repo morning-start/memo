@@ -2,7 +2,9 @@ import 'package:flutter/material.dart';
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:pull_to_refresh/pull_to_refresh.dart'; // 引入refresher库
-import '../providers/countdown_provider.dart';
+import 'package:memo/widgets/list_view.dart';
+
+import 'package:memo/providers/countdown_provider.dart';
 
 class CountdownScreen extends ConsumerWidget {
   const CountdownScreen({super.key});
@@ -16,31 +18,16 @@ class CountdownScreen extends ConsumerWidget {
       appBar: AppBar(
         title: const Text('倒计时'),
       ),
-      body: ListView.builder(
-          itemCount: countdowns.length,
-          itemBuilder: (context, index) {
-            final countdown = countdowns[index];
-            return ListTile(
-              title: Text(
-                countdown.title,
-                style: TextStyle(
-                  decoration:
-                      countdown.isCompleted ? TextDecoration.lineThrough : null,
-                ),
-              ),
-              // subtitle: ,
-              leading: Checkbox(
-                  value: countdown.isCompleted,
-                  onChanged: (val) {
-                    countdownNotifier.toggleCountdown(countdown.id);
-                  }),
-              trailing: IconButton(
-                icon: const Icon(Icons.delete),
-                onPressed: () {
-                  countdownNotifier.removeCountdown(countdown.id);
-                },
-              ),
-            );
+      body: TaskListView(
+          items: countdowns,
+          editFunc: (countdown) async {
+            // 显示对话框以修改待办事项
+          },
+          toggleFunc: (id) {
+            countdownNotifier.toggleCountdown(id);
+          },
+          delFunc: (id) {
+            countdownNotifier.removeCountdown(id);
           }),
       floatingActionButton: FloatingActionButton(
         onPressed: () async {
