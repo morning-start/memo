@@ -18,7 +18,7 @@ class MyApp extends ConsumerWidget {
     final themeMode = ref.watch(themeModeProvider);
     // print(themeMode);
     return MaterialApp(
-      title: '待办倒计时应用',
+      title: 'Memo',
       theme: ThemeData.light(),
       darkTheme: ThemeData.dark(),
       themeMode: themeMode,
