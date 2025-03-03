@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
 
+import 'package:memo/widgets/info_button.dart';
 import 'package:memo/widgets/list_view.dart';
 
 import '../providers/todo_provider.dart';
@@ -70,51 +71,59 @@ class TodoListScreen extends ConsumerWidget {
     return showDialog<Map<String, dynamic>>(
       context: context,
       builder: (context) {
-        return AlertDialog(
-          title: Text(initialTitle.isEmpty ? '添加待办' : '修改待办'),
-          content: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              TextField(
-                controller: TextEditingController(text: initialTitle),
-                onChanged: (value) {
-                  title = value;
-                },
-                decoration: InputDecoration(
-                  hintText: '输入待办事项',
-                  labelText: '标题',
+        return StatefulBuilder(
+          builder: (BuildContext context, StateSetter setState) {
+            return AlertDialog(
+              title: Text(initialTitle.isEmpty ? '添加待办' : '修改待办'),
+              content: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  TextField(
+                    controller: TextEditingController(text: initialTitle),
+                    onChanged: (value) {
+                      title = value;
+                    },
+                    decoration: InputDecoration(
+                      hintText: '输入待办事项',
+                      labelText: '标题',
+                    ),
+                  ),
+                  const SizedBox(height: 10),
+                  InfoButton(
+                      onPressed: () async {
+                        // 显示日期和时间选择器
+                        final pickedDateTime =
+                            await _pickDateTime(context, deadline);
+                        if (pickedDateTime != null) {
+                          setState(() {
+                            deadline = pickedDateTime;
+                          });
+                        }
+                      },
+                      label: '选择截止时间',
+                      feedback:
+                          '${deadline.year}-${deadline.month}-${deadline.day}  ${deadline.hour}:${deadline.minute}'),
+                ],
+              ),
+              actions: [
+                TextButton(
+                  onPressed: () {
+                    Navigator.pop(context);
+                  },
+                  child: const Text('取消'),
                 ),
-              ),
-              const SizedBox(height: 10),
-              ElevatedButton(
-                onPressed: () async {
-                  // 显示日期和时间选择器
-                  final pickedDateTime = await _pickDateTime(context, deadline);
-                  if (pickedDateTime != null) {
-                    deadline = pickedDateTime;
-                  }
-                },
-                child: const Text('选择截止时间'),
-              ),
-            ],
-          ),
-          actions: [
-            TextButton(
-              onPressed: () {
-                Navigator.pop(context);
-              },
-              child: const Text('取消'),
-            ),
-            TextButton(
-              onPressed: () {
-                Navigator.pop(context, {
-                  'title': title,
-                  'deadline': deadline,
-                });
-              },
-              child: Text(initialTitle.isEmpty ? '添加' : '保存'),
-            ),
-          ],
+                TextButton(
+                  onPressed: () {
+                    Navigator.pop(context, {
+                      'title': title,
+                      'deadline': deadline,
+                    });
+                  },
+                  child: Text(initialTitle.isEmpty ? '添加' : '保存'),
+                ),
+              ],
+            );
+          },
         );
       },
     );

@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'package:memo/providers/countdown_provider.dart';
+import 'package:memo/widgets/info_button.dart';
 import 'package:memo/widgets/list_view.dart';
 
 class CountdownScreen extends ConsumerWidget {
@@ -126,32 +127,33 @@ class CountdownScreen extends ConsumerWidget {
                   const SizedBox(height: 10),
 
                   // 选择开始时间
-                  ElevatedButton(
-                    onPressed: () async {
-                      final pickedDateTime =
-                          await _pickDate(context, startTime);
-                      if (pickedDateTime != null) {
-                        setState(() {
-                          startTime = pickedDateTime;
-                        });
-                      }
-                    },
-                    child: const Text('选择开始时间'),
-                  ),
+                  InfoButton(
+                      onPressed: () async {
+                        final pickedDateTime =
+                            await _pickDate(context, startTime);
+                        if (pickedDateTime != null) {
+                          setState(() {
+                            startTime = pickedDateTime;
+                          });
+                        }
+                      },
+                      label: '选择开始时间',
+                      feedback:
+                          '${startTime.year}-${startTime.month}-${startTime.day}'),
                   const SizedBox(height: 10),
 
                   // 设置持续时间（天数）
-                  ElevatedButton(
-                    onPressed: () async {
-                      final days = await _setDurationDays(context);
-                      if (days != null) {
-                        setState(() {
-                          duration = Duration(days: days);
-                        });
-                      }
-                    },
-                    child: const Text('设置持续时间'),
-                  ),
+                  InfoButton(
+                      onPressed: () async {
+                        final days = await _setDurationDays(context);
+                        if (days != null) {
+                          setState(() {
+                            duration = Duration(days: days);
+                          });
+                        }
+                      },
+                      label: '设置持续时间',
+                      feedback: '${duration.inDays} 天'),
                   const SizedBox(height: 10),
 
                   // 是否重复
