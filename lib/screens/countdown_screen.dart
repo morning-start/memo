@@ -262,7 +262,7 @@ class CountdownScreen extends ConsumerWidget {
       context: context,
       initialDate: initialDateTime,
       firstDate: DateTime(1900), // 允许选择从1900年开始的日期
-      lastDate: DateTime(2100), // 最大日期仍然设置为2100年
+      lastDate: DateTime(3000), // 最大日期仍然设置为2100年
     );
     return pickedDate;
   }
