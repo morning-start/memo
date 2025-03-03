@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 
-import 'package:memo/models/base_model.dart';
+import 'package:memo/models/task_model.dart';
 
-class TaskListView<T extends BaseModel> extends StatelessWidget {
+class TaskListView<T extends TaskModel> extends StatelessWidget {
   final List<T> items;
   final Widget Function(T task)? subtitleBuilder;
   final void Function(T task) editFunc;
