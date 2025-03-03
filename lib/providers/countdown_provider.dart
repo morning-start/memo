@@ -9,7 +9,10 @@ class CountdownNotifier extends BaseNotifier<Countdown> {
   /// 添加一个新的倒计时任务。
   ///
   /// 参数:
-  ///   - countdown: 要添加的倒计时任务对象。
+  ///  - title: 任务的标题。
+  ///   - startTime: 任务的开始时间。
+  ///   - duration: 任务的持续时间。
+  ///   - isRecurring: 任务是否为循环任务。
   Future<void> addCountdown(String title, DateTime startTime, Duration duration,
       bool isRecurring) async {
     final countdown = Countdown(
@@ -20,6 +23,9 @@ class CountdownNotifier extends BaseNotifier<Countdown> {
     );
     await super.addTask(countdown);
   }
+
+  @override
+  Countdown fromMap(Map<String, dynamic> map) => Countdown.fromMap(map);
 
   /// 切换指定ID的任务的完成状态。
   ///

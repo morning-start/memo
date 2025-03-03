@@ -74,7 +74,7 @@ class Countdown extends BaseModel {
       'id': id,
       'title': title,
       'startTime': startTime.toIso8601String(),
-      'duration': duration.inDays,
+      'duration': duration.inDays, // 确保持续时间以天为单位存储
       'isRecurring': isRecurring ? 1 : 0,
       'isCompleted': isCompleted ? 1 : 0,
     };
@@ -91,7 +91,7 @@ class Countdown extends BaseModel {
       id: map['id'],
       title: map['title'],
       startTime: DateTime.parse(map['startTime']),
-      duration: Duration(seconds: map['duration']),
+      duration: Duration(days: map['duration']), // 确保持续时间以天为单位读取
       isRecurring: map['isRecurring'] == 1,
       isCompleted: map['isCompleted'] == 1,
     );
