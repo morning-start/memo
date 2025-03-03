@@ -1,9 +1,9 @@
-import 'package:memo/models/base_model.dart';
+import 'package:memo/models/task_model.dart';
 
 /// 表示一个待办事项的类
 /// 包含唯一标识符、标题、截止日期和完成状态
 
-class Todo extends BaseModel {
+class Todo extends TaskModel {
   DateTime deadline;
 
   Todo({
@@ -25,7 +25,7 @@ class Todo extends BaseModel {
   };
 
   // 生成 CREATE TABLE 语句
-  static String get sql => BaseModel.sqlCreateTable(tableName, _columns);
+  static String get sql => TaskModel.sqlCreateTable(tableName, _columns);
 
   /// 将当前对象转换为Map类型，以便于存储或传输
   ///

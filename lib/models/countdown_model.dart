@@ -1,9 +1,9 @@
-import 'package:memo/models/base_model.dart';
+import 'package:memo/models/task_model.dart';
 
 /// 表示一个倒计时任务的类。
 ///
 /// 包含任务的唯一标识符、标题、开始时间、持续时间、是否重复和是否完成的状态。
-class Countdown extends BaseModel {
+class Countdown extends TaskModel {
   DateTime startTime;
   Duration duration;
   bool isRecurring;
@@ -33,7 +33,7 @@ class Countdown extends BaseModel {
   ///
   /// 返回一个SQL语句，用于创建名为'countdowns'的表，包含指定的列。
   /// 列包括'id'、'title'、'startTime'、'duration'、'isRecurring'和'isCompleted'。
-  static String get sql => BaseModel.sqlCreateTable(tableName, _columns);
+  static String get sql => TaskModel.sqlCreateTable(tableName, _columns);
 
   /// 重启倒计时任务。
   ///

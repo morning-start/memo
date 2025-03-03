@@ -1,9 +1,9 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import 'package:memo/models/base_model.dart';
+import 'package:memo/models/task_model.dart';
 import 'package:memo/utils/db_helper.dart';
 
-abstract class BaseNotifier<T extends BaseModel>
+abstract class BaseNotifier<T extends TaskModel>
     extends StateNotifier<List<T>> {
   late DatabaseHelper _db;
   final String tableName;

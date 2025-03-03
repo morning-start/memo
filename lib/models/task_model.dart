@@ -2,12 +2,12 @@ import 'dart:convert';
 
 import 'package:uuid/uuid.dart';
 
-abstract class BaseModel {
+abstract class TaskModel {
   final String id;
   String title;
   bool isCompleted;
 
-  BaseModel({
+  TaskModel({
     String? id,
     required this.title,
     this.isCompleted = false,
@@ -17,7 +17,7 @@ abstract class BaseModel {
   Map<String, dynamic> toMap();
 
   // 抽象方法，需要子类实现
-  factory BaseModel.fromMap(Map<String, dynamic> map) =>
+  factory TaskModel.fromMap(Map<String, dynamic> map) =>
       throw UnimplementedError();
 
   // 切换完成状态
@@ -31,10 +31,10 @@ abstract class BaseModel {
   }
 
   // 从JSON字符串创建对象
-  factory BaseModel.fromJson(String jsonString) {
+  factory TaskModel.fromJson(String jsonString) {
     final Map<String, dynamic> json =
         Map<String, dynamic>.from(jsonDecode(jsonString));
-    return BaseModel.fromMap(json);
+    return TaskModel.fromMap(json);
   }
 
   /// 生成创建表的 SQL 语句。

@@ -1,7 +1,7 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'package:memo/models/todo_model.dart';
-import 'package:memo/providers/base_provider.dart';
+import 'package:memo/providers/task_provider.dart';
 
 class TodoListNotifier extends BaseNotifier<Todo> {
   TodoListNotifier() : super(Todo.tableName);

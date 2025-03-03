@@ -1,7 +1,7 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'package:memo/models/countdown_model.dart';
-import 'package:memo/providers/base_provider.dart';
+import 'package:memo/providers/task_provider.dart';
 
 class CountdownNotifier extends BaseNotifier<Countdown> {
   CountdownNotifier() : super(Countdown.tableName);
