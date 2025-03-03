@@ -33,11 +33,14 @@ class SettingsScreen extends ConsumerWidget {
                 onPressed: _toggleTheme,
               ),
             ),
-            Column(
-              children: [
-                const Text('版本信息：1.0.0'),
-                const Text('开发者：morningstart'),
-              ],
+            Padding(
+              padding: const EdgeInsets.only(bottom: 16.0),
+              child: Column(
+                children: [
+                  const Text('版本信息：1.0.0'),
+                  const Text('开发者：morningstart'),
+                ],
+              ),
             )
           ],
         ),
