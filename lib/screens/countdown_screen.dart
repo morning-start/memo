@@ -102,82 +102,95 @@ class CountdownScreen extends ConsumerWidget {
 
     return showDialog<Map<String, dynamic>>(
       context: context,
-      builder: (context) {
-        return AlertDialog(
-          title: Text(oldTitle.isEmpty ? '添加倒计时' : '修改倒计时'),
-          content: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              // 输入标题
-              TextField(
-                controller: TextEditingController(text: oldTitle),
-                onChanged: (value) {
-                  title = value;
-                },
-                decoration: InputDecoration(
-                  hintText: '输入倒计时标题',
-                  labelText: '标题',
-                ),
-              ),
-              const SizedBox(height: 10),
-
-              // 选择开始时间
-              ElevatedButton(
-                onPressed: () async {
-                  final pickedDateTime = await _pickDate(context, startTime);
-                  if (pickedDateTime != null) {
-                    startTime = pickedDateTime;
-                  }
-                },
-                child: const Text('选择开始时间'),
-              ),
-              const SizedBox(height: 10),
-
-              // 设置持续时间（天数）
-              ElevatedButton(
-                onPressed: () async {
-                  final days = await _setDurationDays(context);
-                  if (days != null) {
-                    duration = Duration(days: days);
-                  }
-                },
-                child: const Text('设置持续时间'),
-              ),
-              const SizedBox(height: 10),
-
-              // 是否重复
-              Row(
+      builder: (BuildContext context) {
+        return StatefulBuilder(
+          builder: (BuildContext context, StateSetter setState) {
+            return AlertDialog(
+              title: Text(oldTitle.isEmpty ? '添加倒计时' : '修改倒计时'),
+              content: Column(
+                mainAxisSize: MainAxisSize.min,
                 children: [
-                  Checkbox(
-                    value: isRecurring,
+                  // 输入标题
+                  TextField(
+                    controller: TextEditingController(text: title),
                     onChanged: (value) {
-                      isRecurring = !isRecurring;
+                      setState(() {
+                        title = value;
+                      });
                     },
+                    decoration: InputDecoration(
+                      hintText: '输入倒计时标题',
+                      labelText: '标题',
+                    ),
                   ),
-                  Text("重复"),
+                  const SizedBox(height: 10),
+
+                  // 选择开始时间
+                  ElevatedButton(
+                    onPressed: () async {
+                      final pickedDateTime =
+                          await _pickDate(context, startTime);
+                      if (pickedDateTime != null) {
+                        setState(() {
+                          startTime = pickedDateTime;
+                        });
+                      }
+                    },
+                    child: const Text('选择开始时间'),
+                  ),
+                  const SizedBox(height: 10),
+
+                  // 设置持续时间（天数）
+                  ElevatedButton(
+                    onPressed: () async {
+                      final days = await _setDurationDays(context);
+                      if (days != null) {
+                        setState(() {
+                          duration = Duration(days: days);
+                        });
+                      }
+                    },
+                    child: const Text('设置持续时间'),
+                  ),
+                  const SizedBox(height: 10),
+
+                  // 是否重复
+                  Row(
+                    children: [
+                      Checkbox(
+                        value: isRecurring,
+                        onChanged: (value) {
+                          setState(() {
+                            isRecurring = !isRecurring;
+                          });
+                        },
+                      ),
+                      Text("重复"),
+                    ],
+                  ),
                 ],
               ),
-            ],
-          ),
-          actions: [
-            TextButton(
-              onPressed: () {
-                Navigator.pop(context);
-              },
-              child: const Text('取消'),
-            ),
-            TextButton(
-              onPressed: () {
-                Navigator.pop(context, {
-                  'title': title,
-                  'startTime': startTime,
-                  'duration': duration,
-                  'isRecurring': isRecurring,
-                });
-              },
-              child: Text(oldTitle.isEmpty ? '添加' : '保存'),
-            ),
-          ],
+              actions: [
+                TextButton(
+                  onPressed: () {
+                    Navigator.pop(context);
+                  },
+                  child: const Text('取消'),
+                ),
+                TextButton(
+                  onPressed: () {
+                    Navigator.pop(context, {
+                      'title': title,
+                      'startTime': startTime,
+                      'duration': duration,
+                      'isRecurring': isRecurring,
+                    });
+                  },
+                  child: Text(oldTitle.isEmpty ? '添加' : '保存'),
+                ),
+              ],
+            );
+          },
         );
       },
     );
