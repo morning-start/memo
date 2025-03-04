@@ -1,0 +1,13 @@
+@startuml cutdowns
+
+entity countdowns {
+    * id 任务id: TEXT PRIMARY KEY
+    --
+    * title 任务标题: TEXT NOT NULL
+    * startTime 开始时间: TEXT NOT NULL
+    * duration 持续时间: INTEGER NOT NULL
+    * isRecurring 是否循环: INTEGER DEFAULT 0
+    * isCompleted 是否完成: INTEGER DEFAULT 0
+}
+
+@enduml
