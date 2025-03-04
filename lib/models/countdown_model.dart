@@ -16,8 +16,8 @@ class Countdown extends TaskModel {
     'title': 'TEXT NOT NULL',
     'startTime': 'TEXT NOT NULL',
     'duration': 'INTEGER NOT NULL',
-    'isRecurring': 'INTEGER NOT NULL',
-    'isCompleted': 'INTEGER NOT NULL',
+    'isRecurring': 'INTEGER DEFAULT 0',
+    'isCompleted': 'INTEGER DEFAULT 0',
   };
 
   Countdown({

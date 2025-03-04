@@ -19,9 +19,9 @@ class Todo extends TaskModel {
   // 列定义
   static final Map<String, String> _columns = {
     'id': 'TEXT PRIMARY KEY',
-    'title': 'TEXT',
+    'title': 'TEXT NOT NULL',
     'deadline': 'TEXT',
-    'isCompleted': 'INTEGER'
+    'isCompleted': 'INTEGER DEFAULT 0'
   };
 
   // 生成 CREATE TABLE 语句
