@@ -5,8 +5,8 @@ import 'package:memo/models/countdown_model.dart';
 import 'package:memo/models/todo_model.dart';
 
 class DatabaseHelper {
-  final String _dbName = 'memo.db';
-  final int _dbVersion = 1;
+  static final String dbName = 'memo.db';
+  static final int dbVersion = 1;
   final List<String> _createSqlList = [
     Todo.sql,
     Countdown.sql,
@@ -24,6 +24,14 @@ class DatabaseHelper {
     return _database!;
   }
 
+  static Future<String> getPath() async {
+    // 获取应用的数据库目录路径
+    String databasesPath = await getDatabasesPath();
+    // 拼接数据库文件名
+    String dbPath = join(databasesPath, dbName);
+    return dbPath;
+  }
+
   /// 初始化数据库并返回 Database 对象。
   ///
   /// 如果数据库文件不存在，则创建新数据库并执行传入的 SQL 语句列表。
@@ -32,7 +40,7 @@ class DatabaseHelper {
   ///   - createSqlList - 创建表的 SQL 语句列表。
   Future<Database> _initDatabase(List<String> createSqlList) async {
     return await openDatabase(
-      join(await getDatabasesPath(), _dbName),
+      await getPath(),
       onCreate: (db, version) async {
         for (var createSql in createSqlList) {
           await db.execute(createSql);
@@ -47,7 +55,7 @@ class DatabaseHelper {
       onOpen: (db) async {
         // TODO: 打开数据库逻辑
       },
-      version: _dbVersion,
+      version: dbVersion,
     );
   }
 
