@@ -60,7 +60,7 @@ class DatabaseHelper {
   }
 
   /// 关闭数据库连接。
-  Future<void> close() async {
+  static Future<void> close() async {
     final db = await _instance.db;
     await db.close();
   }

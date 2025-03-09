@@ -21,13 +21,13 @@ class Countdown extends TaskModel {
   };
 
   Countdown({
-    String? id,
-    required String title,
+    super.id,
+    required super.title,
     required this.startTime,
     required this.duration,
     this.isRecurring = false,
-    bool isCompleted = false,
-  }) : super(id: id, title: title, isCompleted: isCompleted);
+    super.isCompleted,
+  });
 
   /// 获取创建表SQL语句。
   ///
@@ -69,6 +69,7 @@ class Countdown extends TaskModel {
   /// 将当前对象转换为Map类型，以便于存储或传输。
   ///
   /// 返回一个包含任务所有属性的Map对象。
+  @override
   Map<String, dynamic> toMap() {
     return {
       'id': id,

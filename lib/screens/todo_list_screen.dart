@@ -137,12 +137,12 @@ class TodoListScreen extends ConsumerWidget {
       firstDate: DateTime.now(),
       lastDate: DateTime(2100),
     );
-    if (pickedDate != null) {
+    if (pickedDate != null && context.mounted) { // 检查context是否仍然挂载
       final pickedTime = await showTimePicker(
         context: context,
         initialTime: TimeOfDay.fromDateTime(initialDateTime),
       );
-      if (pickedTime != null) {
+      if (pickedTime != null && context.mounted) { // 再次检查context是否仍然挂载
         return DateTime(
           pickedDate.year,
           pickedDate.month,

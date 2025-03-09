@@ -7,11 +7,11 @@ class Todo extends TaskModel {
   DateTime deadline;
 
   Todo({
-    String? id,
-    required String title,
+    super.id,
+    required super.title,
     required this.deadline,
-    bool isCompleted = false,
-  }) : super(id: id, title: title, isCompleted: isCompleted);
+    super.isCompleted,
+  });
 
   // 表名常量
   static const String tableName = 'todos';
