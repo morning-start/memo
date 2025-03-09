@@ -1,21 +1,21 @@
 import 'dart:developer';
 
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:webdav_client/webdav_client.dart' as webdav;
+import 'package:webdav_client/webdav_client.dart' hide File;
 
 import 'package:memo/utils/db_helper.dart';
 
 class SyncHelper {
   static final String defaultDir = "/memo";
-  final webdav.Client client;
+  final Client client;
   final String _dbPath = '$defaultDir/${DatabaseHelper.dbName}';
 
   SyncHelper(String url, String user, String pwd)
-      : client = webdav.newClient(
+      : client = newClient(
           url,
           user: user,
           password: pwd,
-          debug: true
+          // debug: true,
         );
 
   Future<bool> testConnection() async {
@@ -33,13 +33,14 @@ class SyncHelper {
     String remotePath, {
     void Function(int, int)? onProgress,
   }) async {
-    log( 'uploadFile: $localFilePath, $remotePath');
+    log('uploadFile: $localFilePath, $remotePath');
     try {
+      // await DatabaseHelper.close();
       await client.writeFromFile(localFilePath, remotePath,
           onProgress: onProgress);
       return true;
     } catch (e) {
-       log('uploadFile error', error: e);
+      log('uploadFile error', error: e);
       return false;
     }
   }
@@ -87,7 +88,7 @@ class SyncHelper {
   }
 
   // 获取webdav信息
-  static Future<(String, String, String)?> getWebDavInfo() async {
+  static Future<(String, String, String)?> loadWebDavInfo() async {
     // 获取SharedPreferences
     final prefs = await SharedPreferences.getInstance();
     // 获取信息
