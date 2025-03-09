@@ -1,8 +1,11 @@
+import 'dart:developer';
+
 import 'package:flutter/material.dart';
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'package:memo/providers/theme_provider.dart';
+import 'package:memo/utils/func.dart';
 import 'package:memo/utils/sync_helper.dart';
 
 class SettingsScreen extends ConsumerWidget {
@@ -10,6 +13,7 @@ class SettingsScreen extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    // DatabaseHelper.close();
     return Scaffold(
       appBar: AppBar(
         title: const Text('设置'),
@@ -23,6 +27,7 @@ class SettingsScreen extends ConsumerWidget {
               children: [
                 ExchangeTile(title: '切换主题'),
                 WebDavTile(title: '配置WebDav自动同步'),
+                UploadDownloadTile(upTitle: '上传', downTitle: '下载'),
               ],
             ),
             Padding(
@@ -37,6 +42,68 @@ class SettingsScreen extends ConsumerWidget {
           ],
         ),
       ),
+    );
+  }
+}
+
+class UploadDownloadTile extends StatelessWidget {
+  final String upTitle;
+  final String downTitle;
+
+  const UploadDownloadTile({
+    super.key,
+    required this.upTitle,
+    required this.downTitle,
+  });
+  // 上传
+  Future<void> _upload(BuildContext context, SyncHelper client) async {
+    bool res = await client.uploadDb();
+    if (context.mounted) showSnackBar(context, res, '上传成功', fail: '上传失败');
+  }
+
+  // 下载
+  Future<void> _download(BuildContext context, SyncHelper client) async {
+    bool res = await client.downloadDb();
+    if (context.mounted) showSnackBar(context, res, '下载成功', fail: '下载失败');
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return FutureBuilder(
+      future: SyncHelper.getWebDavInfo(),
+      builder: (context, snapshot) {
+        if (snapshot.connectionState == ConnectionState.done) {
+          final webDavInfo = snapshot.data;
+          // 确保 webDavInfo 不为空且不是默认的空字符串元组
+          bool isVisible = webDavInfo != null;
+          if (isVisible) {
+            // 获取 url，username，password
+            final url = webDavInfo.$1;
+            final username = webDavInfo.$2;
+            final password = webDavInfo.$3;
+            // 创建 SyncHelper
+            var client = SyncHelper(url, username, password);
+            return Column(
+              children: [
+                ListTile(
+                    title: Text(upTitle),
+                    onTap: () async => await _upload(context, client),
+                    trailing: IconButton(
+                        icon: const Icon(Icons.cloud_upload),
+                        onPressed: () async => await _upload(context, client))),
+                ListTile(
+                  title: Text(downTitle),
+                  onTap: () async => await _download(context, client),
+                  trailing: IconButton(
+                      icon: const Icon(Icons.cloud_download),
+                      onPressed: () async => await _download(context, client)),
+                ),
+              ],
+            );
+          }
+        }
+        return Container(); // 或者其他占位符
+      },
     );
   }
 }
@@ -79,6 +146,7 @@ class WebDavTile extends StatelessWidget {
     final urlController = TextEditingController();
     final usernameController = TextEditingController();
     final passwordController = TextEditingController();
+    // bool isConnect = false;
     void webDavInfo() async {
       // 弹出 dialog 以输入 WebDav 配置信息
       // 包括 url，账号，密码
@@ -122,29 +190,24 @@ class WebDavTile extends StatelessWidget {
 
                       var client = SyncHelper(url, username, password);
                       var isConnect = await client.testConnection();
-                      if (isConnect) {
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(content: Text('连接成功')),
-                        );
-                      } else {
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(content: Text('连接失败')),
+                      if (context.mounted) {
+                        showSnackBar(
+                          context,
+                          isConnect,
+                          '连接成功',
+                          fail: '连接失败',
+                          onSuccess: () async {
+                            await SyncHelper.saveWebDavInfo(
+                                url, username, password);
+                            // ScaffoldMessenger.of(context).showSnackBar(
+                            //   SnackBar(content: Text('保存成功')),
+                            // );
+                            Navigator.pop(context);
+                          },
                         );
                       }
                     },
-                    child: Text('测试连接'),
-                  ),
-                  // 保存按钮
-                  ElevatedButton(
-                    onPressed: () async {
-                      // 处理保存逻辑
-                      final url = urlController.text;
-                      final user = usernameController.text;
-                      final pwd = passwordController.text;
-                      await SyncHelper.saveWebDavInfo(url, user, pwd);
-                      Navigator.pop(context);
-                    },
-                    child: Text('保存'),
+                    child: Text('测试连接并保存'),
                   ),
                 ],
               ),
