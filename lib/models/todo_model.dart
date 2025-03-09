@@ -34,6 +34,7 @@ class Todo extends TaskModel {
   /// 这样做是为了便于在不同的平台或数据库中存储和传输时间信息
   /// [isCompleted]属性是一个布尔值，它被转换为整数(1或0)以便于存储
   /// 这种转换是因为某些数据库系统不直接支持布尔值的存储
+  @override
   Map<String, dynamic> toMap() {
     return {
       'id': id,
