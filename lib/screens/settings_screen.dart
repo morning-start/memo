@@ -68,7 +68,7 @@ class UploadDownloadTile extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return FutureBuilder(
-      future: SyncHelper.getWebDavInfo(),
+      future: SyncHelper.loadWebDavInfo(),
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.done) {
           final webDavInfo = snapshot.data;
@@ -149,9 +149,14 @@ class WebDavTile extends StatelessWidget {
       // 弹出 dialog 以输入 WebDav 配置信息
       // 包括 url，账号，密码
       // 接收信息为 res
+      final info = await SyncHelper.loadWebDavInfo();
       await showDialog(
           context: context,
           builder: (context) {
+            urlController.text = info?.$1 ?? '';
+            usernameController.text = info?.$2 ?? '';
+            passwordController.text = info?.$3 ?? '';
+
             return AlertDialog(
               title: Text(title),
               content: Column(
