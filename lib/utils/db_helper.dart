@@ -46,15 +46,6 @@ class DatabaseHelper {
           await db.execute(createSql);
         }
       },
-      onUpgrade: (db, oldVersion, newVersion) async {
-        // TODO: 升级数据库逻辑
-      },
-      onDowngrade: (db, oldVersion, newVersion) async {
-        // TODO: 降级数据库逻辑
-      },
-      onOpen: (db) async {
-        // TODO: 打开数据库逻辑
-      },
       version: dbVersion,
     );
   }

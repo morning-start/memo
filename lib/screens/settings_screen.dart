@@ -197,10 +197,7 @@ class WebDavTile extends StatelessWidget {
                           onSuccess: () async {
                             await SyncHelper.saveWebDavInfo(
                                 url, username, password);
-                            // ScaffoldMessenger.of(context).showSnackBar(
-                            //   SnackBar(content: Text('保存成功')),
-                            // );
-                            Navigator.pop(context);
+                            if (context.mounted) Navigator.pop(context);
                           },
                         );
                       }
