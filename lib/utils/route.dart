@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
-import '../screens/todo_list_screen.dart';
-import '../screens/countdown_screen.dart';
-import '../screens/settings_screen.dart';
+
+import 'package:memo/screens/countdown_screen.dart';
+import 'package:memo/screens/settings_screen.dart';
+import 'package:memo/screens/todo_list_screen.dart';
 
 // 导入 db_seeder.dart 文件
 // 确保 Todo 模型可用

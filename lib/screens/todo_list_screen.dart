@@ -3,10 +3,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
 
+import 'package:memo/providers/todo_provider.dart';
 import 'package:memo/widgets/info_button.dart';
 import 'package:memo/widgets/list_view.dart';
-
-import '../providers/todo_provider.dart';
 
 class TodoListScreen extends ConsumerWidget {
   const TodoListScreen({super.key});
