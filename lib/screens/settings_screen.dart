@@ -32,7 +32,7 @@ class SettingsScreen extends ConsumerWidget {
               padding: const EdgeInsets.only(bottom: 16.0),
               child: Column(
                 children: [
-                  const Text('版本信息：1.0.0'),
+                  const Text('版本信息：1.1.0'),
                   const Text('开发者：morningstart'),
                 ],
               ),
