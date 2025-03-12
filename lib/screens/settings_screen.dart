@@ -44,7 +44,7 @@ class SettingsScreen extends ConsumerWidget {
   }
 }
 
-class UploadDownloadTile extends StatelessWidget {
+class UploadDownloadTile extends StatefulWidget {
   final String upTitle;
   final String downTitle;
 
@@ -53,15 +53,58 @@ class UploadDownloadTile extends StatelessWidget {
     required this.upTitle,
     required this.downTitle,
   });
+
+  @override
+  _UploadDownloadTileState createState() => _UploadDownloadTileState();
+}
+
+class _UploadDownloadTileState extends State<UploadDownloadTile> {
+  double _uploadProgress = 0.0; // 上传进度
+  double _downloadProgress = 0.0; // 下载进度
+  bool _isUploading = false; // 是否正在上传
+  bool _isDownloading = false; // 是否正在下载
+
   // 上传
   Future<void> _upload(BuildContext context, SyncHelper client) async {
-    bool res = await client.uploadDb();
+    setState(() {
+      _isUploading = true;
+      _uploadProgress = 0.0; // 重置进度
+    });
+
+    bool res = await client.uploadDb(
+      onProgress: (sent, total) {
+        setState(() {
+          _uploadProgress = sent / total; // 更新进度
+        });
+      },
+    );
+
+    setState(() {
+      _isUploading = false;
+    });
+
     if (context.mounted) showSnackBar(context, res, '上传成功', fail: '上传失败');
   }
 
   // 下载
   Future<void> _download(BuildContext context, SyncHelper client) async {
-    bool res = await client.downloadDb();
+    setState(() {
+      _isDownloading = true;
+      _downloadProgress = 0.0; // 重置进度
+    });
+
+    bool res = await client.downloadDb(
+      onProgress: (received, total) {
+        setState(() {
+          _downloadProgress = received / total; // 更新进度
+        });
+      },
+    );
+
+    setState(() {
+      _isDownloading = false;
+    });
+
     if (context.mounted) showSnackBar(context, res, '下载成功', fail: '下载失败');
   }
 
@@ -72,29 +115,44 @@ class UploadDownloadTile extends StatelessWidget {
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.done) {
           final webDavInfo = snapshot.data;
-          // 确保 webDavInfo 不为空且不是默认的空字符串元组
           bool isVisible = webDavInfo != null;
           if (isVisible) {
-            // 获取 url，username，password
             final url = webDavInfo.$1;
             final username = webDavInfo.$2;
             final password = webDavInfo.$3;
-            // 创建 SyncHelper
             var client = SyncHelper(url, username, password);
+
             return Column(
               children: [
                 ListTile(
-                    title: Text(upTitle),
-                    onTap: () async => await _upload(context, client),
-                    trailing: IconButton(
-                        icon: const Icon(Icons.cloud_upload),
-                        onPressed: () async => await _upload(context, client))),
+                  title: Text(widget.upTitle),
+                  onTap: () async => await _upload(context, client),
+                  trailing: IconButton(
+                    icon: const Icon(Icons.cloud_upload),
+                    onPressed: () async => await _upload(context, client),
+                  ),
+                  subtitle: _isUploading
+                      ? LinearProgressIndicator(
+                          value: _uploadProgress,
+                          backgroundColor: Colors.grey[300],
+                          color: Colors.blue,
+                        )
+                      : null,
+                ),
                 ListTile(
-                  title: Text(downTitle),
+                  title: Text(widget.downTitle),
                   onTap: () async => await _download(context, client),
                   trailing: IconButton(
-                      icon: const Icon(Icons.cloud_download),
-                      onPressed: () async => await _download(context, client)),
+                    icon: const Icon(Icons.cloud_download),
+                    onPressed: () async => await _download(context, client),
+                  ),
+                  subtitle: _isDownloading
+                      ? LinearProgressIndicator(
+                          value: _downloadProgress,
+                          backgroundColor: Colors.grey[300],
+                          color: Colors.blue,
+                        )
+                      : null,
                 ),
               ],
             );
@@ -191,8 +249,8 @@ class WebDavTile extends StatelessWidget {
                       final username = usernameController.text;
                       final password = passwordController.text;
 
-                      var client = SyncHelper(url, username, password);
-                      var isConnect = await client.testConnection();
+                      var isConnect = await SyncHelper.testConnection(
+                          url, username, password);
                       if (context.mounted) {
                         showSnackBar(
                           context,

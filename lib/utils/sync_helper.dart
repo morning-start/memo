@@ -1,4 +1,5 @@
 import 'dart:developer';
+import 'dart:io';
 
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:webdav_client/webdav_client.dart' hide File;
@@ -6,20 +7,25 @@ import 'package:webdav_client/webdav_client.dart' hide File;
 import 'package:memo/utils/db_helper.dart';
 
 class SyncHelper {
-  static final String defaultDir = "/memo";
+  static final String defaultDir = "memo";
   final Client client;
-  final String _dbPath = '$defaultDir/${DatabaseHelper.dbName}';
+  final String _dbPath = DatabaseHelper.dbName;
 
   SyncHelper(String url, String user, String pwd)
       : client = newClient(
-          url,
+          '${url.replaceAll(RegExp(r'/$'), '')}/$defaultDir', // 去除末尾的斜杠并添加默认目录
           user: user,
           password: pwd,
           // debug: true,
         );
 
-  Future<bool> testConnection() async {
+  static Future<bool> testConnection(url, user, password) async {
     try {
+      var client = newClient(
+        url,
+        user: user,
+        password: password,
+      );
       await client.ping();
       await client.mkdir(defaultDir);
       return true;
@@ -27,17 +33,15 @@ class SyncHelper {
       return false;
     }
   }
-
   Future<bool> uploadFile(
     String localFilePath,
     String remotePath, {
     void Function(int, int)? onProgress,
   }) async {
-    log('uploadFile: $localFilePath, $remotePath');
+    // log('uploadFile: $localFilePath, $remotePath');
     try {
-      // await DatabaseHelper.close();
-      await client.writeFromFile(localFilePath, remotePath,
-          onProgress: onProgress);
+      File file = File(localFilePath);
+      await client.write(remotePath, file.readAsBytesSync(), onProgress : onProgress);
       return true;
     } catch (e) {
       log('uploadFile error', error: e);
@@ -62,6 +66,7 @@ class SyncHelper {
   // 上传数据库db
   Future<bool> uploadDb({
     void Function(int, int)? onProgress,
+
   }) async {
     return await uploadFile(await DatabaseHelper.getPath(), _dbPath,
         onProgress: onProgress);
