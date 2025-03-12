@@ -22,12 +22,11 @@
 ### 代办列表
 
 ![todo1](docs/imgs/todo1.png)
-![todo2](docs/imgs/todo1.png)
+![todo2](docs/imgs/todo2.png)
 
 ### 倒计时列表
 
 ![down1](docs/imgs/down1.png)
-
 ![down2](docs/imgs/down2.png)
 
 ### 设置界面
