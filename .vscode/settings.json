@@ -5,5 +5,27 @@
     "prefs",
     "Propfind",
     "webdav"
-  ]
+  ],
+  "files.exclude": {
+    "**/.git": true,
+    "**/.svn": true,
+    "**/.hg": true,
+    "**/.DS_Store": true,
+    "**/Thumbs.db": true,
+    "android/": true,
+    "ios/": true,
+    "macos/": true,
+    "linux/": true,
+    "windows/": true,
+    "web": true,
+    "test": true,
+    ".fvm": true,
+    ".dart_tool": true,
+    ".metadata": true,
+    "devtools_options.yaml": true,
+    "analysis_options.yaml": true,
+    ".flutter-plugins": true,
+    ".flutter-plugins-dependencies": true
+  },
+  "explorerExclude.backup": {}
 }
