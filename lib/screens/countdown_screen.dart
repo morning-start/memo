@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'package:memo/providers/countdown_provider.dart';
+import 'package:memo/utils/sustain.dart';
 import 'package:memo/widgets/info_button.dart';
 import 'package:memo/widgets/list_view.dart';
 
@@ -23,7 +24,7 @@ class CountdownScreen extends ConsumerWidget {
         subtitleBuilder: (countdown) {
           final now = DateTime.now();
           final elapsedDays = now.difference(countdown.startTime).inDays;
-          final totalDays = countdown.duration.inDays;
+          final totalDays = countdown.duration.totalDays;
           final progress = elapsedDays / totalDays;
 
           return Row(
@@ -53,7 +54,7 @@ class CountdownScreen extends ConsumerWidget {
               countdown.id,
               result['title'] as String,
               result['startTime'] as DateTime,
-              result['duration'] as Duration,
+              result['duration'] as Sustain,
               result['isRecurring'] as bool,
             );
           }
@@ -71,14 +72,14 @@ class CountdownScreen extends ConsumerWidget {
             context,
             '',
             DateTime.now(),
-            Duration(days: 1),
+            Sustain(days: 1),
             false,
           );
           if (result != null) {
             countdownNotifier.addCountdown(
               result['title'] as String,
               result['startTime'] as DateTime,
-              result['duration'] as Duration,
+              result['duration'] as Sustain,
               result['isRecurring'] as bool,
             );
           }
@@ -92,13 +93,13 @@ class CountdownScreen extends ConsumerWidget {
     BuildContext context,
     String oldTitle,
     DateTime oldStartTime,
-    Duration oldDuration,
+    Sustain oldDuration,
     bool oldIsRecurring,
   ) async {
     // 初始化变量
     String title = oldTitle;
     DateTime startTime = oldStartTime;
-    Duration duration = oldDuration;
+    Sustain duration = oldDuration;
     bool isRecurring = oldIsRecurring;
 
     return showDialog<Map<String, dynamic>>(
@@ -142,18 +143,18 @@ class CountdownScreen extends ConsumerWidget {
                           '${startTime.year}-${startTime.month}-${startTime.day}'),
                   const SizedBox(height: 10),
 
-                  // 设置持续时间（天数）
+                  // 设置持续时间（年、月、天）
                   InfoButton(
                       onPressed: () async {
-                        final days = await _setDurationDays(context);
-                        if (days != null) {
+                        final newDuration = await _setDuration(context, duration);
+                        if (newDuration != null) {
                           setState(() {
-                            duration = Duration(days: days);
+                            duration = newDuration;
                           });
                         }
                       },
                       label: '设置持续时间',
-                      feedback: '${duration.inDays} 天'),
+                      feedback: '${duration.years} 年 ${duration.months} 月 ${duration.days} 天'),
                   const SizedBox(height: 10),
 
                   // 是否重复
@@ -198,44 +199,48 @@ class CountdownScreen extends ConsumerWidget {
     );
   }
 
-  Future<int?> _setDurationDays(BuildContext context) async {
-    int? days = await _showDaysPicker(
-      context: context,
-      title: '选择天数',
-      min: 1,
-      max: 365,
-    );
-    return days;
-  }
+  Future<Sustain?> _setDuration(BuildContext context, Sustain oldDuration) async {
+    int years = oldDuration.years;
+    int months = oldDuration.months;
+    int days = oldDuration.days;
 
-  Future<int?> _showDaysPicker({
-    required BuildContext context,
-    required String title,
-    required int min,
-    required int max,
-  }) async {
-    int value = min;
-
-    return await showDialog<int>(
+    return await showDialog<Sustain>(
       context: context,
       builder: (context) {
         return AlertDialog(
-          title: Text(title),
-          content: Row(
+          title: const Text('设置持续时间'),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
             children: [
-              Expanded(
-                child: TextField(
-                  keyboardType: TextInputType.number,
-                  decoration: InputDecoration(labelText: '请输入天数'),
-                  onChanged: (text) {
-                    int? parsedValue = int.tryParse(text);
-                    if (parsedValue != null &&
-                        parsedValue >= min &&
-                        parsedValue <= max) {
-                      value = parsedValue;
-                    }
-                  },
-                ),
+              TextField(
+                keyboardType: TextInputType.number,
+                decoration: const InputDecoration(labelText: '年'),
+                onChanged: (text) {
+                  int? parsedValue = int.tryParse(text);
+                  if (parsedValue != null) {
+                    years = parsedValue;
+                  }
+                },
+              ),
+              TextField(
+                keyboardType: TextInputType.number,
+                decoration: const InputDecoration(labelText: '月'),
+                onChanged: (text) {
+                  int? parsedValue = int.tryParse(text);
+                  if (parsedValue != null) {
+                    months = parsedValue;
+                  }
+                },
+              ),
+              TextField(
+                keyboardType: TextInputType.number,
+                decoration: const InputDecoration(labelText: '天'),
+                onChanged: (text) {
+                  int? parsedValue = int.tryParse(text);
+                  if (parsedValue != null) {
+                    days = parsedValue;
+                  }
+                },
               ),
             ],
           ),
@@ -244,19 +249,21 @@ class CountdownScreen extends ConsumerWidget {
               onPressed: () {
                 Navigator.of(context).pop(null); // 取消时返回 null
               },
-              child: Text('取消'),
+              child: const Text('取消'),
             ),
             TextButton(
               onPressed: () {
-                Navigator.of(context).pop(value); // 确定时返回选择的天数
+                Navigator.of(context).pop(Sustain(years: years, months: months, days: days));
               },
-              child: Text('确定'),
+              child: const Text('确定'),
             ),
           ],
         );
       },
     );
   }
+
+
 
   Future<DateTime?> _pickDate(
       BuildContext context, DateTime initialDateTime) async {
@@ -268,4 +275,4 @@ class CountdownScreen extends ConsumerWidget {
     );
     return pickedDate;
   }
-}
+}    

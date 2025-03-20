@@ -1,11 +1,13 @@
 import 'package:memo/models/task_model.dart';
+import 'package:memo/utils/sustain.dart';
+
 
 /// 表示一个倒计时任务的类。
 ///
 /// 包含任务的唯一标识符、标题、开始时间、持续时间、是否重复和是否完成的状态。
 class Countdown extends TaskModel {
   DateTime startTime;
-  Duration duration;
+  Sustain duration;
   bool isRecurring;
 
   /// 倒计时任务的表名。
@@ -58,7 +60,7 @@ class Countdown extends TaskModel {
   ///   - newStartTime: 任务的新开始时间。
   ///   - newDuration: 任务的新持续时间。
   ///   - newIsRecurring: 任务的新重复状态。
-  void update(String newTitle, DateTime newStartTime, Duration newDuration,
+  void update(String newTitle, DateTime newStartTime, Sustain newDuration,
       bool newIsRecurring) {
     title = newTitle;
     startTime = newStartTime;
@@ -75,7 +77,7 @@ class Countdown extends TaskModel {
       'id': id,
       'title': title,
       'startTime': startTime.toIso8601String(),
-      'duration': duration.inDays, // 确保持续时间以天为单位存储
+      'duration': duration.totalDays,
       'isRecurring': isRecurring ? 1 : 0,
       'isCompleted': isCompleted ? 1 : 0,
     };
@@ -92,10 +94,9 @@ class Countdown extends TaskModel {
       id: map['id'],
       title: map['title'],
       startTime: DateTime.parse(map['startTime']),
-      duration: Duration(days: map['duration']), // 确保持续时间以天为单位读取
+      duration: Sustain.fromDays(map['duration']),
       isRecurring: map['isRecurring'] == 1,
       isCompleted: map['isCompleted'] == 1,
     );
   }
-
 }

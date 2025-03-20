@@ -38,17 +38,20 @@ class _SyncTileState extends ConsumerState<SyncTile> {
 
     bool res = await widget.client.uploadDb(
       onProgress: (sent, total) {
-        setState(() {
-          _uploadProgress = sent / total; // 更新进度
-        });
+        if (mounted) {
+          setState(() {
+            _uploadProgress = sent / total; // 更新进度
+          });
+        }
       },
     );
 
-    setState(() {
-      _isUploading = false;
-    });
-
-    if (context.mounted) showSnackBar(context, res, '上传成功', fail: '上传失败');
+    if (mounted) {
+      setState(() {
+        _isUploading = false;
+      });
+      showSnackBar(context, res, '上传成功', fail: '上传失败');
+    }
   }
 
   // 下载
@@ -61,22 +64,24 @@ class _SyncTileState extends ConsumerState<SyncTile> {
 
     bool res = await widget.client.downloadDb(
       onProgress: (received, total) {
-        setState(() {
-          _downloadProgress = received / total; // 更新进度
-        });
+        if (mounted) {
+          setState(() {
+            _downloadProgress = received / total; // 更新进度
+          });
+        }
       },
     );
 
-    setState(() {
-      _isDownloading = false;
-    });
-
-    if (context.mounted) showSnackBar(context, res, '下载成功', fail: '下载失败');
-
-    // 在这里你可以使用 ref 调用其他 provider
-    // 例如：ref.read(someProvider.notifier).doSomething();
-    ref.read(todoListProvider.notifier).refreshTasksAfterSync();
-    ref.read(countdownProvider.notifier).refreshTasksAfterSync();
+    if (mounted) {
+      setState(() {
+        _isDownloading = false;
+      });
+      showSnackBar(context, res, '下载成功', fail: '下载失败');
+      // 在这里你可以使用 ref 调用其他 provider
+      // 例如：ref.read(someProvider.notifier).doSomething();
+      ref.read(todoListProvider.notifier).refreshTasksAfterSync();
+      ref.read(countdownProvider.notifier).refreshTasksAfterSync();
+    }
   }
 
   @override
@@ -116,4 +121,4 @@ class _SyncTileState extends ConsumerState<SyncTile> {
       ],
     );
   }
-}
+}    

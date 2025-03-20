@@ -2,6 +2,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'package:memo/models/countdown_model.dart';
 import 'package:memo/providers/task_provider.dart';
+import 'package:memo/utils/sustain.dart';
 
 class CountdownNotifier extends TaskNotifier<Countdown> {
   CountdownNotifier() : super(Countdown.tableName);
@@ -13,7 +14,7 @@ class CountdownNotifier extends TaskNotifier<Countdown> {
   ///   - startTime: 任务的开始时间。
   ///   - duration: 任务的持续时间。
   ///   - isRecurring: 任务是否为循环任务。
-  Future<void> addCountdown(String title, DateTime startTime, Duration duration,
+  Future<void> addCountdown(String title, DateTime startTime, Sustain duration,
       bool isRecurring) async {
     final countdown = Countdown(
       title: title,
@@ -52,7 +53,7 @@ class CountdownNotifier extends TaskNotifier<Countdown> {
   ///   - newDuration: 新的任务持续时间。
   ///   - newIsRecurring: 新的任务是否为循环任务。
   Future<void> updateCountdown(String id, String newTitle,
-      DateTime newStartTime, Duration newDuration, bool newIsRecurring) async {
+      DateTime newStartTime, Sustain newDuration, bool newIsRecurring) async {
     final tmp = state.firstWhere((countdown) => countdown.id == id);
     tmp.update(newTitle, newStartTime, newDuration, newIsRecurring);
     await super.updateTask(id, tmp);
