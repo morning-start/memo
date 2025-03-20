@@ -116,9 +116,7 @@ class CountdownScreen extends ConsumerWidget {
                   TextField(
                     controller: titleController,
                     onChanged: (value) {
-                      setState(() {
-                        // 无需更新 title 变量，直接使用 controller.text
-                      });
+                      // 不需要 setState 调用
                     },
                     decoration: InputDecoration(
                       hintText: '输入倒计时标题',
@@ -216,16 +214,25 @@ class CountdownScreen extends ConsumerWidget {
                 controller: yearsController,
                 keyboardType: TextInputType.number,
                 decoration: const InputDecoration(labelText: '年'),
+                onChanged: (value) {
+                  // 不需要 setState 调用
+                },
               ),
               TextField(
                 controller: monthsController,
                 keyboardType: TextInputType.number,
                 decoration: const InputDecoration(labelText: '月'),
+                onChanged: (value) {
+                  // 不需要 setState 调用
+                },
               ),
               TextField(
                 controller: daysController,
                 keyboardType: TextInputType.number,
                 decoration: const InputDecoration(labelText: '天'),
+                onChanged: (value) {
+                  // 不需要 setState 调用
+                },
               ),
             ],
           ),

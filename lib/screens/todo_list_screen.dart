@@ -64,7 +64,7 @@ class TodoListScreen extends ConsumerWidget {
 
   Future<Map<String, dynamic>?> _showTodoDialog(BuildContext context,
       String initialTitle, DateTime initialDeadline) async {
-    String title = initialTitle;
+    final titleController = TextEditingController(text: initialTitle);
     DateTime deadline = initialDeadline;
 
     return showDialog<Map<String, dynamic>>(
@@ -78,9 +78,9 @@ class TodoListScreen extends ConsumerWidget {
                 mainAxisSize: MainAxisSize.min,
                 children: [
                   TextField(
-                    controller: TextEditingController(text: initialTitle),
+                    controller: titleController,
                     onChanged: (value) {
-                      title = value;
+                      // 不需要额外操作，controller 会自动更新文本
                     },
                     decoration: InputDecoration(
                       hintText: '输入待办事项',
@@ -114,7 +114,7 @@ class TodoListScreen extends ConsumerWidget {
                 TextButton(
                   onPressed: () {
                     Navigator.pop(context, {
-                      'title': title,
+                      'title': titleController.text,
                       'deadline': deadline,
                     });
                   },
@@ -153,4 +153,4 @@ class TodoListScreen extends ConsumerWidget {
     }
     return null;
   }
-}
+}    

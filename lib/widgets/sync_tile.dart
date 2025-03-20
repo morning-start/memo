@@ -31,56 +31,73 @@ class _SyncTileState extends ConsumerState<SyncTile> {
 
   // 上传
   Future<void> _upload(BuildContext context) async {
+    if (_isUploading) return; // 避免重复上传
     setState(() {
       _isUploading = true;
       _uploadProgress = 0.0; // 重置进度
     });
 
-    bool res = await widget.client.uploadDb(
-      onProgress: (sent, total) {
-        if (mounted) {
-          setState(() {
-            _uploadProgress = sent / total; // 更新进度
-          });
-        }
-      },
-    );
+    try {
+      bool res = await widget.client.uploadDb(
+        onProgress: (sent, total) {
+          if (mounted) {
+            setState(() {
+              _uploadProgress = sent / total; // 更新进度
+            });
+          }
+        },
+      );
 
-    if (mounted) {
-      setState(() {
-        _isUploading = false;
-      });
-      showSnackBar(context, res, '上传成功', fail: '上传失败');
+      if (mounted) {
+        showSnackBar(context, res, '上传成功', fail: '上传失败');
+      }
+    } catch (e) {
+      if (mounted) {
+        showSnackBar(context, false, '上传失败', fail: '上传过程中出现错误: $e');
+      }
+    } finally {
+      if (mounted) {
+        setState(() {
+          _isUploading = false;
+        });
+      }
     }
   }
 
   // 下载
   Future<void> _download(BuildContext context) async {
-    final ref = this.ref; // 获取 ref
+    if (_isDownloading) return; // 避免重复下载
     setState(() {
       _isDownloading = true;
       _downloadProgress = 0.0; // 重置进度
     });
 
-    bool res = await widget.client.downloadDb(
-      onProgress: (received, total) {
-        if (mounted) {
-          setState(() {
-            _downloadProgress = received / total; // 更新进度
-          });
-        }
-      },
-    );
+    try {
+      bool res = await widget.client.downloadDb(
+        onProgress: (received, total) {
+          if (mounted) {
+            setState(() {
+              _downloadProgress = received / total; // 更新进度
+            });
+          }
+        },
+      );
 
-    if (mounted) {
-      setState(() {
-        _isDownloading = false;
-      });
-      showSnackBar(context, res, '下载成功', fail: '下载失败');
-      // 在这里你可以使用 ref 调用其他 provider
-      // 例如：ref.read(someProvider.notifier).doSomething();
-      ref.read(todoListProvider.notifier).refreshTasksAfterSync();
-      ref.read(countdownProvider.notifier).refreshTasksAfterSync();
+      if (mounted) {
+        showSnackBar(context, res, '下载成功', fail: '下载失败');
+        ref.read(todoListProvider.notifier).refreshTasksAfterSync();
+        ref.read(countdownProvider.notifier).refreshTasksAfterSync();
+      }
+    } catch (e) {
+      if (mounted) {
+        showSnackBar(context, false, '下载失败', fail: '下载过程中出现错误: $e');
+      }
+    } finally {
+      if (mounted) {
+        setState(() {
+          _isDownloading = false;
+        });
+      }
     }
   }
 
@@ -90,10 +107,10 @@ class _SyncTileState extends ConsumerState<SyncTile> {
       children: [
         ListTile(
           title: Text(widget.upTitle),
-          onTap: () async => await _upload(context),
+          onTap: () => _upload(context),
           trailing: IconButton(
             icon: const Icon(Icons.cloud_upload),
-            onPressed: () async => await _upload(context),
+            onPressed: () => _upload(context),
           ),
           subtitle: _isUploading
               ? LinearProgressIndicator(
@@ -105,10 +122,10 @@ class _SyncTileState extends ConsumerState<SyncTile> {
         ),
         ListTile(
           title: Text(widget.downTitle),
-          onTap: () async => await _download(context),
+          onTap: () => _download(context),
           trailing: IconButton(
             icon: const Icon(Icons.cloud_download),
-            onPressed: () async => await _download(context),
+            onPressed: () => _download(context),
           ),
           subtitle: _isDownloading
               ? LinearProgressIndicator(
@@ -121,4 +138,5 @@ class _SyncTileState extends ConsumerState<SyncTile> {
       ],
     );
   }
-}    
+}
+    
