@@ -97,7 +97,7 @@ class CountdownScreen extends ConsumerWidget {
     bool oldIsRecurring,
   ) async {
     // 初始化变量
-    String title = oldTitle;
+    final titleController = TextEditingController(text: oldTitle);
     DateTime startTime = oldStartTime;
     Sustain duration = oldDuration;
     bool isRecurring = oldIsRecurring;
@@ -114,10 +114,10 @@ class CountdownScreen extends ConsumerWidget {
                 children: [
                   // 输入标题
                   TextField(
-                    controller: TextEditingController(text: title),
+                    controller: titleController,
                     onChanged: (value) {
                       setState(() {
-                        title = value;
+                        // 无需更新 title 变量，直接使用 controller.text
                       });
                     },
                     decoration: InputDecoration(
@@ -164,7 +164,7 @@ class CountdownScreen extends ConsumerWidget {
                         value: isRecurring,
                         onChanged: (value) {
                           setState(() {
-                            isRecurring = !isRecurring;
+                            isRecurring = value ?? false;
                           });
                         },
                       ),
@@ -183,7 +183,7 @@ class CountdownScreen extends ConsumerWidget {
                 TextButton(
                   onPressed: () {
                     Navigator.pop(context, {
-                      'title': title,
+                      'title': titleController.text,
                       'startTime': startTime,
                       'duration': duration,
                       'isRecurring': isRecurring,
@@ -200,9 +200,9 @@ class CountdownScreen extends ConsumerWidget {
   }
 
   Future<Sustain?> _setDuration(BuildContext context, Sustain oldDuration) async {
-    int years = oldDuration.years;
-    int months = oldDuration.months;
-    int days = oldDuration.days;
+    final yearsController = TextEditingController(text: oldDuration.years.toString());
+    final monthsController = TextEditingController(text: oldDuration.months.toString());
+    final daysController = TextEditingController(text: oldDuration.days.toString());
 
     return await showDialog<Sustain>(
       context: context,
@@ -213,34 +213,19 @@ class CountdownScreen extends ConsumerWidget {
             mainAxisSize: MainAxisSize.min,
             children: [
               TextField(
+                controller: yearsController,
                 keyboardType: TextInputType.number,
                 decoration: const InputDecoration(labelText: '年'),
-                onChanged: (text) {
-                  int? parsedValue = int.tryParse(text);
-                  if (parsedValue != null) {
-                    years = parsedValue;
-                  }
-                },
               ),
               TextField(
+                controller: monthsController,
                 keyboardType: TextInputType.number,
                 decoration: const InputDecoration(labelText: '月'),
-                onChanged: (text) {
-                  int? parsedValue = int.tryParse(text);
-                  if (parsedValue != null) {
-                    months = parsedValue;
-                  }
-                },
               ),
               TextField(
+                controller: daysController,
                 keyboardType: TextInputType.number,
                 decoration: const InputDecoration(labelText: '天'),
-                onChanged: (text) {
-                  int? parsedValue = int.tryParse(text);
-                  if (parsedValue != null) {
-                    days = parsedValue;
-                  }
-                },
               ),
             ],
           ),
@@ -253,6 +238,9 @@ class CountdownScreen extends ConsumerWidget {
             ),
             TextButton(
               onPressed: () {
+                int years = int.tryParse(yearsController.text) ?? 0;
+                int months = int.tryParse(monthsController.text) ?? 0;
+                int days = int.tryParse(daysController.text) ?? 0;
                 Navigator.of(context).pop(Sustain(years: years, months: months, days: days));
               },
               child: const Text('确定'),
@@ -262,8 +250,6 @@ class CountdownScreen extends ConsumerWidget {
       },
     );
   }
-
-
 
   Future<DateTime?> _pickDate(
       BuildContext context, DateTime initialDateTime) async {
