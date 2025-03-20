@@ -10,11 +10,13 @@ import 'package:memo/utils/sync_helper.dart';
 class SyncTile extends ConsumerStatefulWidget {
   final String upTitle;
   final String downTitle;
+  final SyncHelper client; // 传入的 WebDAV 客户端
 
   const SyncTile({
     super.key,
     required this.upTitle,
     required this.downTitle,
+    required this.client, // 添加 client 参数
   });
 
   @override
@@ -28,13 +30,13 @@ class _SyncTileState extends ConsumerState<SyncTile> {
   bool _isDownloading = false; // 是否正在下载
 
   // 上传
-  Future<void> _upload(BuildContext context, SyncHelper client) async {
+  Future<void> _upload(BuildContext context) async {
     setState(() {
       _isUploading = true;
       _uploadProgress = 0.0; // 重置进度
     });
 
-    bool res = await client.uploadDb(
+    bool res = await widget.client.uploadDb(
       onProgress: (sent, total) {
         setState(() {
           _uploadProgress = sent / total; // 更新进度
@@ -50,14 +52,14 @@ class _SyncTileState extends ConsumerState<SyncTile> {
   }
 
   // 下载
-  Future<void> _download(BuildContext context, SyncHelper client) async {
+  Future<void> _download(BuildContext context) async {
     final ref = this.ref; // 获取 ref
     setState(() {
       _isDownloading = true;
       _downloadProgress = 0.0; // 重置进度
     });
 
-    bool res = await client.downloadDb(
+    bool res = await widget.client.downloadDb(
       onProgress: (received, total) {
         setState(() {
           _downloadProgress = received / total; // 更新进度
@@ -79,56 +81,39 @@ class _SyncTileState extends ConsumerState<SyncTile> {
 
   @override
   Widget build(BuildContext context) {
-    return FutureBuilder(
-      future: SyncHelper.loadWebDavInfo(),
-      builder: (context, snapshot) {
-        if (snapshot.connectionState == ConnectionState.done) {
-          final webDavInfo = snapshot.data;
-          bool isVisible = webDavInfo != null;
-          if (isVisible) {
-            final url = webDavInfo.$1;
-            final username = webDavInfo.$2;
-            final password = webDavInfo.$3;
-            var client = SyncHelper(url, username, password);
-
-            return Column(
-              children: [
-                ListTile(
-                  title: Text(widget.upTitle),
-                  onTap: () async => await _upload(context, client),
-                  trailing: IconButton(
-                    icon: const Icon(Icons.cloud_upload),
-                    onPressed: () async => await _upload(context, client),
-                  ),
-                  subtitle: _isUploading
-                      ? LinearProgressIndicator(
-                          value: _uploadProgress,
-                          backgroundColor: Colors.grey[300],
-                          color: Colors.blue,
-                        )
-                      : null,
-                ),
-                ListTile(
-                  title: Text(widget.downTitle),
-                  onTap: () async => await _download(context, client),
-                  trailing: IconButton(
-                    icon: const Icon(Icons.cloud_download),
-                    onPressed: () async => await _download(context, client),
-                  ),
-                  subtitle: _isDownloading
-                      ? LinearProgressIndicator(
-                          value: _downloadProgress,
-                          backgroundColor: Colors.grey[300],
-                          color: Colors.blue,
-                        )
-                      : null,
-                ),
-              ],
-            );
-          }
-        }
-        return Container(); // 或者其他占位符
-      },
+    return Column(
+      children: [
+        ListTile(
+          title: Text(widget.upTitle),
+          onTap: () async => await _upload(context),
+          trailing: IconButton(
+            icon: const Icon(Icons.cloud_upload),
+            onPressed: () async => await _upload(context),
+          ),
+          subtitle: _isUploading
+              ? LinearProgressIndicator(
+                  value: _uploadProgress,
+                  backgroundColor: Colors.grey[300],
+                  color: Colors.blue,
+                )
+              : null,
+        ),
+        ListTile(
+          title: Text(widget.downTitle),
+          onTap: () async => await _download(context),
+          trailing: IconButton(
+            icon: const Icon(Icons.cloud_download),
+            onPressed: () async => await _download(context),
+          ),
+          subtitle: _isDownloading
+              ? LinearProgressIndicator(
+                  value: _downloadProgress,
+                  backgroundColor: Colors.grey[300],
+                  color: Colors.blue,
+                )
+              : null,
+        ),
+      ],
     );
   }
 }
