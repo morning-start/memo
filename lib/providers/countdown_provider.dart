@@ -3,7 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:memo/models/countdown_model.dart';
 import 'package:memo/providers/task_provider.dart';
 
-class CountdownNotifier extends BaseNotifier<Countdown> {
+class CountdownNotifier extends TaskNotifier<Countdown> {
   CountdownNotifier() : super(Countdown.tableName);
 
   /// 添加一个新的倒计时任务。

@@ -51,7 +51,7 @@ class DatabaseHelper {
   }
 
   /// 关闭数据库连接。
-  static Future<void> close() async {
+  Future<void> close() async {
     final db = await _instance.db;
     await db.close();
   }
@@ -150,5 +150,16 @@ class DatabaseHelper {
       where: where,
       whereArgs: whereArgs,
     );
+  }
+
+  /// 重新打开数据库，确保读取到最新的数据。
+  Future<void> reopenDatabase() async {
+    // 关闭当前数据库连接
+    if (_database != null) {
+      await _database!.close();
+      _database = null;
+    }
+    // 重新打开数据库
+    _database = await _initDatabase(_createSqlList);
   }
 }
