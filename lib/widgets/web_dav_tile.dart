@@ -69,6 +69,9 @@ class WebDavTile extends StatelessWidget {
       // 加载已保存的WebDAV配置信息
       final info = await SyncHelper.loadWebDavInfo();
       
+      // 检查组件是否仍然挂载
+      if (!context.mounted) return;
+      
       // 显示配置对话框
       await showDialog(
         context: context,

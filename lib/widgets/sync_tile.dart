@@ -67,13 +67,13 @@ class SyncTile extends ConsumerStatefulWidget {
   });
 
   @override
-  _SyncTileState createState() => _SyncTileState();
+  SyncTileState createState() => SyncTileState();
 }
 
 /// 同步瓦片状态类
 /// 
 /// 管理同步瓦片的状态和UI更新，包括上传/下载进度和状态管理。
-class _SyncTileState extends ConsumerState<SyncTile> {
+class SyncTileState extends ConsumerState<SyncTile> {
   /// 上传进度值（0.0-1.0）
   /// 
   /// 表示当前上传操作的进度比例，0.0表示未开始，1.0表示完成。
@@ -133,12 +133,12 @@ class _SyncTileState extends ConsumerState<SyncTile> {
       );
 
       // 显示上传结果
-      if (mounted) {
+      if (context.mounted) {
         showSnackBar(context, res, '上传成功', fail: '上传失败');
       }
     } catch (e) {
       // 显示上传错误
-      if (mounted) {
+      if (context.mounted) {
         showSnackBar(context, false, '上传失败', fail: '上传过程中出现错误: $e');
       }
     } finally {
@@ -191,7 +191,7 @@ class _SyncTileState extends ConsumerState<SyncTile> {
       );
 
       // 显示下载结果并刷新数据
-      if (mounted) {
+      if (context.mounted) {
         showSnackBar(context, res, '下载成功', fail: '下载失败');
         // 刷新todo列表
         ref.read(todoListProvider.notifier).refreshTasksAfterSync();
@@ -200,7 +200,7 @@ class _SyncTileState extends ConsumerState<SyncTile> {
       }
     } catch (e) {
       // 显示下载错误
-      if (mounted) {
+      if (context.mounted) {
         showSnackBar(context, false, '下载失败', fail: '下载过程中出现错误: $e');
       }
     } finally {
