@@ -2,7 +2,8 @@ import 'package:flutter/material.dart';
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import 'package:memo/providers/countdown_provider.dart';
+import 'package:memo/providers/group_provider.dart';
+import 'package:memo/providers/routine_provider.dart';
 import 'package:memo/providers/todo_provider.dart';
 import 'package:memo/utils/func.dart';
 import 'package:memo/utils/sync_helper.dart';
@@ -164,7 +165,7 @@ class SyncTileState extends ConsumerState<SyncTile> {
   /// 3. 调用SyncHelper的downloadDb方法执行下载
   /// 4. 通过onProgress回调更新下载进度
   /// 5. 显示下载结果（成功/失败）
-  /// 6. 刷新todo和countdown数据提供者
+  /// 6. 刷新 todo、规律事项与分组数据提供者
   /// 7. 处理异常情况并重置下载状态
   Future<void> _download(BuildContext context) async {
     // 避免重复下载
@@ -193,10 +194,10 @@ class SyncTileState extends ConsumerState<SyncTile> {
       // 显示下载结果并刷新数据
       if (context.mounted) {
         showSnackBar(context, res, '下载成功', fail: '下载失败');
-        // 刷新todo列表
+        // 刷新待办、规律事项与分组
         ref.read(todoListProvider.notifier).refreshTasksAfterSync();
-        // 刷新倒计时列表
-        ref.read(countdownProvider.notifier).refreshTasksAfterSync();
+        ref.read(routinesProvider.notifier).refreshTasksAfterSync();
+        ref.read(groupsProvider.notifier).reload();
       }
     } catch (e) {
       // 显示下载错误

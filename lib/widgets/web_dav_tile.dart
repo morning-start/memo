@@ -162,7 +162,7 @@ class WebDavTile extends StatelessWidget {
       // 右侧云端数据图标按钮
       trailing: IconButton(
         onPressed: () => webDavInfo(), 
-        icon: Icon(Icons.cloud)
+        icon: Icon(Icons.cloud_rounded)
       ),
     );
   }

@@ -3,10 +3,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'package:memo/providers/theme_provider.dart';
+import 'package:memo/utils/app_theme.dart';
 import 'package:memo/utils/route.dart';
 
 void main() async {
-  WidgetsFlutterBinding.ensureInitialized(); // 确保 Flutter 框架初始化完成
+  WidgetsFlutterBinding.ensureInitialized();
   runApp(const ProviderScope(child: MyApp()));
 }
 
@@ -16,11 +17,10 @@ class MyApp extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final themeMode = ref.watch(themeModeProvider);
-    // print(themeMode);
     return MaterialApp(
       title: 'Memo',
-      theme: ThemeData.light(),
-      darkTheme: ThemeData.dark(),
+      theme: buildLightTheme(),
+      darkTheme: buildDarkTheme(),
       themeMode: themeMode,
       home: const MainScreen(),
     );
@@ -40,14 +40,13 @@ class _MainScreenState extends State<MainScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: routes[_currentIndex].screen,
+      body: IndexedStack(
+        index: _currentIndex,
+        children: routes.map((r) => r.screen).toList(),
+      ),
       bottomNavigationBar: BottomNavigationBar(
         currentIndex: _currentIndex,
-        onTap: (index) {
-          setState(() {
-            _currentIndex = index;
-          });
-        },
+        onTap: (index) => setState(() => _currentIndex = index),
         items: routes.map((group) => group.item).toList(),
       ),
     );

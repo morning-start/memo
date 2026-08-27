@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 
-import 'package:memo/screens/countdown_screen.dart';
+import 'package:memo/screens/overview_screen.dart';
 import 'package:memo/screens/settings_screen.dart';
-import 'package:memo/screens/todo_list_screen.dart';
+import 'package:memo/screens/tasks_screen.dart';
 
 /// 路由配置文件
 ///
@@ -69,33 +69,33 @@ class Route {
 /// 应用程序路由列表
 ///
 /// 定义应用程序的所有主要路由及其对应的底部导航栏配置。
-/// 当前包含三个主要功能页面：待办列表、倒计时列表和设置页面。
+/// 当前包含三个主要功能页面：概览、任务和设置。
 ///
 /// 路由列表说明：
-///   - 待办列表：显示和管理用户的待办事项
-///   - 倒计时列表：显示和管理用户的倒计时任务
+///   - 概览：本周前瞻统计与即将到期的规律事项（提前准备，避免到当天才提醒）
+///   - 任务：规律事项（周期任务，完成自动重置）与一次性待办
 ///   - 设置：提供应用设置和配置选项
 final List<Route> routes = [
-  // 待办列表路由
+  // 概览路由
   Route(
-    name: 'todoList',
-    screen: const TodoListScreen(),
+    name: 'overview',
+    screen: const OverviewScreen(),
     item: const BottomNavigationBarItem(
-      icon: Icon(Icons.list),
-      label: '待办列表',
+      icon: Icon(Icons.insights),
+      label: '概览',
     ),
   ),
-  
-  // 倒计时列表路由
+
+  // 任务路由
   Route(
-    name: 'countdown',
-    screen: const CountdownScreen(),
+    name: 'tasks',
+    screen: const TasksScreen(),
     item: const BottomNavigationBarItem(
-      icon: Icon(Icons.timer),
-      label: '倒计时列表',
+      icon: Icon(Icons.task_alt),
+      label: '任务',
     ),
   ),
-  
+
   // 设置页面路由
   Route(
     name: 'settings',
