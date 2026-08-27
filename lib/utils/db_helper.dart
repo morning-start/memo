@@ -1,7 +1,8 @@
 import 'package:path/path.dart';
 import 'package:sqflite/sqflite.dart';
 
-import 'package:memo/models/countdown_model.dart';
+import 'package:memo/models/group_model.dart';
+import 'package:memo/models/routine_model.dart';
 import 'package:memo/models/todo_model.dart';
 
 /// 数据库辅助类
@@ -37,12 +38,13 @@ class DatabaseHelper {
   static final String dbName = 'memo.db';
   
   /// 数据库版本号
-  static final int dbVersion = 1;
+  static final int dbVersion = 2;
   
   /// 创建表的 SQL 语句列表
   final List<String> _createSqlList = [
-    Todo.sql,      // 创建待办事项表
-    Countdown.sql, // 创建倒计时表
+    Todo.sql,       // 创建待办事项表
+    Group.sql,      // 创建分组表
+    Routine.sql,    // 创建规律事项表
   ];
 
   /// 单例实例
@@ -96,6 +98,14 @@ class DatabaseHelper {
         // 执行所有创建表的 SQL 语句
         for (var createSql in createSqlList) {
           await db.execute(createSql);
+        }
+      },
+      onUpgrade: (db, oldVersion, newVersion) async {
+        // v1 -> v2：引入分组与规律事项，替换旧的倒计时表
+        if (oldVersion < 2) {
+          await db.execute(Group.sql);
+          await db.execute(Routine.sql);
+          await db.execute('DROP TABLE IF EXISTS countdowns');
         }
       },
       version: dbVersion,

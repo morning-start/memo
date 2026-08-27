@@ -5,11 +5,11 @@ import 'package:memo/utils/db_helper.dart';
 
 /// 任务状态管理抽象基类
 ///
-/// 采用模板方法设计模式，为待办事项和倒计时任务提供统一的状态管理接口。
+/// 采用模板方法设计模式，为不同类型的一次性任务提供统一的状态管理接口。
 /// 该类定义了任务管理的通用操作，具体实现由子类通过 fromMap 方法完成。
 /// 
 /// 设计特点：
-/// - 泛型设计支持不同类型的任务模型（Todo、Countdown）
+/// - 泛型设计支持不同类型的任务模型（如 Todo）
 /// - 继承 StateNotifier 实现响应式状态管理
 /// - 封装数据库操作，提供统一的 CRUD 接口
 /// - 支持数据同步后的状态刷新
@@ -33,7 +33,7 @@ abstract class TaskNotifier<T extends TaskModel> extends StateNotifier<List<T>> 
   /// 构造函数
 ///
 /// 参数：
-  ///   - tableName: 对应的数据库表名（如 'todos'、'countdowns'）
+  ///   - tableName: 对应的数据库表名（如 'todos'）
   /// 
   /// 初始化时设置空列表状态，并异步初始化数据库连接
   TaskNotifier(this.tableName) : super([]) {
@@ -78,7 +78,7 @@ abstract class TaskNotifier<T extends TaskModel> extends StateNotifier<List<T>> 
   /// 参数：
   ///   - map: 数据库查询结果的字典数据
   /// 
-  /// 返回：具体的任务模型实例（Todo 或 Countdown）
+  /// 返回：具体的任务模型实例（如 Todo）
   /// 
   /// 实现示例：
   /// ```dart

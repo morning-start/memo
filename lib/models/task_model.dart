@@ -14,7 +14,7 @@ import 'package:uuid/uuid.dart';
 /// - 支持多种序列化格式（Map、JSON）
 ///
 /// 适用场景：
-/// - 作为倒计时任务(Countdown)和待办事项(Todo)的基类
+/// - 作为一次性待办事项(Todo)等任务类型的基类
 /// - 需要统一任务接口的多类型任务管理系统
 /// - 需要持久化存储的任务数据模型
 abstract class TaskModel {

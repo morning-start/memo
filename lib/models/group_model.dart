@@ -4,28 +4,22 @@ import 'package:memo/models/task_model.dart';
 
 /// 分组数据模型
 ///
-/// 分组是"规律事项"的容器，用来承载一件大事情拆解出的多个周期子项。
-/// 分组本身不强制拥有周期，只是一个可展开/收起的归类层级。
+/// 表示一组规律事项的容器，用于把"一件需要拆成细碎事项"的事情组织在一起。
+/// 例如「净水器」分组下可包含「滤芯一（每1月）」「滤芯二（每3月）」等多个
+/// 独立周期、独立自动重置的子项。分组本身不持有周期，只负责归类与聚合展示。
 ///
-/// 示例：净水器（分组）
-///   - 滤芯一 · 每1月
-///   - 滤芯二 · 每3月
-///   - 滤芯三 · 每6月
-///
-/// 设计说明：
-/// - 采用两级层级（分组 -> 规律项），满足大多数实际场景
-/// - 分组不直接参与周期计算，聚合状态由子项推导
+/// 设计要点：
+/// - 只做容器，不强制有自己的周期
+/// - 每个子项（Routine）拥有独立的周期与"下次到期"时间
+/// - 分组展示时聚合子项状态（最近到期项、最高紧急度）
 class Group {
   /// 分组唯一标识符
   final String id;
 
-  /// 分组名称
+  /// 分组名称，例如「净水器」「空调滤网」
   String name;
 
-  /// 排序权重（越大越靠前），预留能力
-  int sortOrder;
-
-  /// 创建时间，作为稳定锚点
+  /// 创建时间，用于排序与稳定 id
   final DateTime createdAt;
 
   /// 数据库表名
@@ -35,7 +29,6 @@ class Group {
   static final Map<String, String> _columns = {
     'id': 'TEXT PRIMARY KEY',
     'name': 'TEXT NOT NULL',
-    'sortOrder': 'INTEGER DEFAULT 0',
     'createdAt': 'TEXT NOT NULL',
   };
 
@@ -43,7 +36,6 @@ class Group {
   Group({
     String? id,
     required this.name,
-    this.sortOrder = 0,
     DateTime? createdAt,
   })  : id = id ?? const Uuid().v4(),
         createdAt = createdAt ?? DateTime.now();
@@ -51,19 +43,26 @@ class Group {
   /// 建表 SQL
   static String get sql => TaskModel.sqlCreateTable(tableName, _columns);
 
-  /// 序列化为数据库 Map
-  Map<String, dynamic> toMap() => {
-        'id': id,
-        'name': name,
-        'sortOrder': sortOrder,
-        'createdAt': createdAt.toIso8601String(),
-      };
+  /// 序列化为 Map
+  Map<String, dynamic> toMap() {
+    return {
+      'id': id,
+      'name': name,
+      'createdAt': createdAt.toIso8601String(),
+    };
+  }
 
-  /// 从数据库 Map 反序列化
-  factory Group.fromMap(Map<String, dynamic> map) => Group(
-        id: map['id'],
-        name: map['name'],
-        sortOrder: map['sortOrder'] ?? 0,
-        createdAt: DateTime.parse(map['createdAt']),
-      );
+  /// 从 Map 还原
+  factory Group.fromMap(Map<String, dynamic> map) {
+    return Group(
+      id: map['id'],
+      name: map['name'],
+      createdAt: DateTime.parse(map['createdAt']),
+    );
+  }
+
+  /// 重命名分组
+  void rename(String newName) {
+    name = newName.trim();
+  }
 }
