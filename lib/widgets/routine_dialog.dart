@@ -6,6 +6,7 @@ import 'package:memo/models/group_model.dart';
 import 'package:memo/models/routine_model.dart';
 import 'package:memo/providers/group_provider.dart';
 import 'package:memo/providers/routine_provider.dart';
+import 'package:memo/utils/app_theme.dart';
 import 'package:memo/utils/routine_logic.dart';
 
 /// 弹出"新建/编辑规律事项"对话框。
@@ -70,7 +71,7 @@ Future<void> showRoutineDialog(
                       hintText: '例如：更换净水器滤芯',
                     ),
                   ),
-                  const SizedBox(height: 12),
+                  const SizedBox(height: AppSpacing.lg),
                   // 所属分组
                   InputDecorator(
                     decoration: const InputDecoration(labelText: '所属分组'),
@@ -93,12 +94,14 @@ Future<void> showRoutineDialog(
                       ),
                     ),
                   ),
-                  const SizedBox(height: 12),
-                  const Text('周期', style: TextStyle(fontWeight: FontWeight.w600)),
-                  const SizedBox(height: 6),
+                  const SizedBox(height: AppSpacing.lg),
+                  Text('周期',
+                      style: AppTypography.labelLarge(
+                          Theme.of(context).brightness == Brightness.dark)),
+                  const SizedBox(height: AppSpacing.sm),
                   Wrap(
-                    spacing: 6,
-                    runSpacing: 6,
+                    spacing: AppSpacing.sm,
+                    runSpacing: AppSpacing.sm,
                     children: [
                       for (final preset in intervalCandidates)
                         ChoiceChip(
@@ -109,15 +112,20 @@ Future<void> showRoutineDialog(
                         ),
                     ],
                   ),
-                  const SizedBox(height: 12),
-                  const Text('提前提醒',
-                      style: TextStyle(fontWeight: FontWeight.w600)),
-                  const Text('默认提前 1 周。长周期的大项可改为提前 1 个月',
-                      style: TextStyle(fontSize: 12, color: Colors.grey)),
-                  const SizedBox(height: 6),
+                  const SizedBox(height: AppSpacing.lg),
+                  Text('提前提醒',
+                      style: AppTypography.labelLarge(
+                          Theme.of(context).brightness == Brightness.dark)),
+                  const SizedBox(height: AppSpacing.xs),
+                  Text(
+                    '默认提前 1 周。长周期的大项可改为提前 1 个月',
+                    style: AppTypography.bodyMedium(
+                        Theme.of(context).brightness == Brightness.dark),
+                  ),
+                  const SizedBox(height: AppSpacing.sm),
                   Wrap(
-                    spacing: 6,
-                    runSpacing: 6,
+                    spacing: AppSpacing.sm,
+                    runSpacing: AppSpacing.sm,
                     children: [
                       for (final preset in warnLeadCandidates)
                         ChoiceChip(
@@ -227,7 +235,7 @@ void _handleGroupMenu(
             ),
             const Divider(height: 1),
             ListTile(
-              leading: const Icon(Icons.drive_file_rename_outline),
+              leading: const Icon(Icons.drive_file_rename_outline_rounded),
               title: const Text('重命名'),
               onTap: () {
                 Navigator.pop(context);
@@ -235,18 +243,23 @@ void _handleGroupMenu(
               },
             ),
             ListTile(
-              leading: const Icon(Icons.delete_outline),
+              leading: Icon(Icons.delete_outline_rounded,
+                  color: AppColors.overdue),
               title: const Text('删除分组'),
-              subtitle: Text('仅删除分组，${routines.where((r) => r.groupId == group.id).length} 个子任务转为未分组'),
+              subtitle: Text(
+                  '仅删除分组，${routines.where((r) => r.groupId == group.id).length} 个子任务转为未分组'),
               onTap: () async {
                 Navigator.pop(context);
                 final confirmed = await showDialog<bool>(
                   context: context,
                   builder: (context) => AlertDialog(
                     title: const Text('删除分组'),
-                    content: Text('确定删除分组「${group.name}」吗？分组下 ${routines.where((r) => r.groupId == group.id).length} 个子任务将转为未分组。'),
+                    content: Text(
+                        '确定删除分组「${group.name}」吗？分组下 ${routines.where((r) => r.groupId == group.id).length} 个子任务将转为未分组。'),
                     actions: [
-                      TextButton(onPressed: () => Navigator.pop(context, false), child: const Text('取消')),
+                      TextButton(
+                          onPressed: () => Navigator.pop(context, false),
+                          child: const Text('取消')),
                       TextButton(
                         onPressed: () => Navigator.pop(context, true),
                         child: const Text('删除'),
@@ -255,8 +268,8 @@ void _handleGroupMenu(
                   ),
                 );
                 if (confirmed == true) {
-                  // 子任务移出分组
-                  for (final r in routines.where((r) => r.groupId == group.id)) {
+                  for (final r
+                      in routines.where((r) => r.groupId == group.id)) {
                     routineNotifier.updateRoutine(id: r.id, groupId: '');
                   }
                   await groupNotifier.removeGroup(group.id);
@@ -287,7 +300,9 @@ Future<void> _renameGroupDialog(
           autofocus: true,
         ),
         actions: [
-          TextButton(onPressed: () => Navigator.pop(context), child: const Text('取消')),
+          TextButton(
+              onPressed: () => Navigator.pop(context),
+              child: const Text('取消')),
           TextButton(
             onPressed: () {
               Navigator.pop(context);

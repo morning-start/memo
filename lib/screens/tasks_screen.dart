@@ -64,12 +64,20 @@ class _TasksScreenState extends ConsumerState<TasksScreen>
     return Scaffold(
       appBar: AppBar(
         title: const Text('任务'),
-        bottom: TabBar(
-          controller: _tabController,
-          tabs: const [
-            Tab(text: '规律事项'),
-            Tab(text: '待办'),
-          ],
+        bottom: PreferredSize(
+          preferredSize: const Size.fromHeight(48),
+          child: Container(
+            alignment: Alignment.centerLeft,
+            padding: const EdgeInsets.symmetric(horizontal: 16),
+            child: TabBar(
+              controller: _tabController,
+              isScrollable: true,
+              tabs: const [
+                Tab(text: '规律事项'),
+                Tab(text: '待办'),
+              ],
+            ),
+          ),
         ),
       ),
       body: TabBarView(
@@ -81,7 +89,7 @@ class _TasksScreenState extends ConsumerState<TasksScreen>
       ),
       floatingActionButton: FloatingActionButton.extended(
         onPressed: _onFabPressed,
-        icon: const Icon(Icons.add),
+        icon: const Icon(Icons.add_rounded),
         label: Text(_tabIndex == 0 ? '新建规律事项' : '新建待办'),
       ),
     );

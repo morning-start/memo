@@ -5,6 +5,7 @@ import 'package:intl/intl.dart';
 
 import 'package:memo/models/todo_model.dart';
 import 'package:memo/providers/todo_provider.dart';
+import 'package:memo/utils/app_theme.dart';
 import 'package:memo/widgets/info_button.dart';
 import 'package:memo/widgets/list_view.dart';
 
@@ -18,23 +19,34 @@ class TodoListView extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final cs = Theme.of(context).colorScheme;
     final todos = ref.watch(todoListProvider);
     final notifier = ref.read(todoListProvider.notifier);
 
     if (todos.isEmpty) {
       return Center(
         child: Padding(
-          padding: const EdgeInsets.all(32),
+          padding: const EdgeInsets.all(AppSpacing.xxxl),
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              Icon(Icons.checklist, size: 56, color: Colors.blueGrey.shade200),
-              const SizedBox(height: 16),
-              const Text('没有待办事项',
-                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600)),
-              const SizedBox(height: 8),
+              Container(
+                width: 80,
+                height: 80,
+                decoration: BoxDecoration(
+                  color: cs.primary.withOpacity(0.08),
+                  shape: BoxShape.circle,
+                ),
+                child: Icon(Icons.checklist_rounded,
+                    size: 40, color: cs.primary.withOpacity(0.5)),
+              ),
+              const SizedBox(height: AppSpacing.xl),
+              Text('没有待办事项',
+                  style: AppTypography.titleMedium(isDark)),
+              const SizedBox(height: AppSpacing.sm),
               Text('日常一次性任务、一次性截止事件可以放在这里',
-                  style: TextStyle(color: Colors.grey.shade600)),
+                  style: AppTypography.bodyMedium(isDark)),
             ],
           ),
         ),
@@ -70,8 +82,8 @@ Future<Map<String, dynamic>?> showTodoDialog(
   Todo? editing,
 }) {
   final initialTitle = editing?.title ?? '';
-  final initialDeadline = editing?.deadline ??
-      DateTime.now().add(const Duration(days: 1));
+  final initialDeadline =
+      editing?.deadline ?? DateTime.now().add(const Duration(days: 1));
   final titleController = TextEditingController(text: initialTitle);
   DateTime deadline = initialDeadline;
 
@@ -92,7 +104,7 @@ Future<Map<String, dynamic>?> showTodoDialog(
                     hintText: '输入一次性待办',
                   ),
                 ),
-                const SizedBox(height: 10),
+                const SizedBox(height: AppSpacing.md),
                 InfoButton(
                   onPressed: () async {
                     final picked = await _pickDateTime(context, deadline);
@@ -105,7 +117,9 @@ Future<Map<String, dynamic>?> showTodoDialog(
               ],
             ),
             actions: [
-              TextButton(onPressed: () => Navigator.pop(context), child: const Text('取消')),
+              TextButton(
+                  onPressed: () => Navigator.pop(context),
+                  child: const Text('取消')),
               TextButton(
                 onPressed: () {
                   Navigator.pop(context, {

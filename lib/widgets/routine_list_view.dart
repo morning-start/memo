@@ -6,6 +6,7 @@ import 'package:memo/models/group_model.dart';
 import 'package:memo/models/routine_model.dart';
 import 'package:memo/providers/group_provider.dart';
 import 'package:memo/providers/routine_provider.dart';
+import 'package:memo/utils/app_theme.dart';
 import 'package:memo/utils/routine_logic.dart';
 import 'package:memo/widgets/routine_dialog.dart';
 
@@ -58,6 +59,7 @@ class _RoutineListViewState extends ConsumerState<RoutineListView> {
     return RefreshIndicator(
       onRefresh: () => notifier.reload(),
       child: ListView(
+        padding: const EdgeInsets.only(bottom: 100),
         children: children,
       ),
     );
@@ -65,26 +67,37 @@ class _RoutineListViewState extends ConsumerState<RoutineListView> {
 
   /// 空状态引导
   Widget _buildEmpty() {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final cs = Theme.of(context).colorScheme;
     return Center(
       child: Padding(
-        padding: const EdgeInsets.all(32),
+        padding: const EdgeInsets.all(AppSpacing.xxxl),
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Icon(Icons.autorenew, size: 56, color: Colors.blueGrey.shade200),
-            const SizedBox(height: 16),
-            const Text('还没有长期 / 规律任务',
-                style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600)),
-            const SizedBox(height: 8),
+            Container(
+              width: 80,
+              height: 80,
+              decoration: BoxDecoration(
+                color: cs.primary.withOpacity(0.08),
+                shape: BoxShape.circle,
+              ),
+              child: Icon(Icons.autorenew_rounded,
+                  size: 40, color: cs.primary.withOpacity(0.5)),
+            ),
+            const SizedBox(height: AppSpacing.xl),
+            Text('还没有长期 / 规律任务',
+                style: AppTypography.titleMedium(isDark)),
+            const SizedBox(height: AppSpacing.sm),
             Text(
               '为"每多久做一次"的事情设定任务，\n完成后自动重新计时，不用记下一次时间',
               textAlign: TextAlign.center,
-              style: TextStyle(color: Colors.grey.shade600),
+              style: AppTypography.bodyMedium(isDark),
             ),
-            const SizedBox(height: 20),
+            const SizedBox(height: AppSpacing.xxl),
             FilledButton.icon(
               onPressed: () => showRoutineDialog(context, ref),
-              icon: const Icon(Icons.add),
+              icon: const Icon(Icons.add_rounded),
               label: const Text('新建规律事项'),
             ),
           ],
@@ -94,15 +107,13 @@ class _RoutineListViewState extends ConsumerState<RoutineListView> {
   }
 
   Widget _sectionHeader(String title) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     return Padding(
-      padding: const EdgeInsets.fromLTRB(16, 16, 16, 4),
+      padding: const EdgeInsets.fromLTRB(
+          AppSpacing.lg, AppSpacing.xl, AppSpacing.lg, AppSpacing.sm),
       child: Text(
         title,
-        style: TextStyle(
-          fontSize: 13,
-          fontWeight: FontWeight.w600,
-          color: Colors.blueGrey.shade400,
-        ),
+        style: AppTypography.labelLarge(isDark),
       ),
     );
   }
@@ -114,6 +125,8 @@ class _RoutineListViewState extends ConsumerState<RoutineListView> {
     List<Routine> routinesInGroup,
     RoutineNotifier notifier,
   ) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final cs = Theme.of(context).colorScheme;
     // 计算聚合：最近到期的未暂停子项
     final active = routinesInGroup.where((r) => !r.isPaused).toList();
     String subtitle;
@@ -127,38 +140,46 @@ class _RoutineListViewState extends ConsumerState<RoutineListView> {
           days < 0 ? '已逾期 ${-days} 天' : (days == 0 ? '今天到期' : '$days 天后');
       subtitle = '最近到期：${nearest.title} · $when';
     }
-    final anyOverdue = active.any((r) => routineStatus(r) == RoutineStatus.overdue);
-    final anyDueSoon = active.any((r) => routineStatus(r) == RoutineStatus.dueSoon);
+    final anyOverdue =
+        active.any((r) => routineStatus(r) == RoutineStatus.overdue);
+    final anyDueSoon =
+        active.any((r) => routineStatus(r) == RoutineStatus.dueSoon);
+
+    final folderColor = anyOverdue
+        ? AppColors.overdue
+        : (anyDueSoon
+            ? AppColors.dueSoon
+            : (isDark ? AppColors.darkPrimary : AppColors.primary));
 
     return Padding(
-      padding: const EdgeInsets.only(top: 8),
+      padding: const EdgeInsets.only(top: AppSpacing.sm),
       child: Card(
-        margin: const EdgeInsets.symmetric(horizontal: 8),
-        elevation: 0,
-        color: Theme.of(context).colorScheme.surfaceContainerHighest,
+        margin: const EdgeInsets.symmetric(horizontal: AppSpacing.sm),
         child: ExpansionTile(
-          leading: Icon(
-            Icons.folder,
-            color: anyOverdue
-                ? Colors.red
-                : (anyDueSoon
-                    ? Colors.orange
-                    : Theme.of(context).colorScheme.primary),
+          leading: Container(
+            width: 36,
+            height: 36,
+            decoration: BoxDecoration(
+              color: folderColor.withOpacity(0.1),
+              borderRadius: BorderRadius.circular(AppRadius.sm),
+            ),
+            child: Icon(Icons.folder_rounded, color: folderColor, size: 20),
           ),
           title: Text(group.name,
-              style: const TextStyle(fontWeight: FontWeight.w600)),
-          subtitle: Text(subtitle),
+              style: AppTypography.titleMedium(isDark)),
+          subtitle: Text(subtitle,
+              style: AppTypography.bodyMedium(isDark)),
           trailing: Row(
             mainAxisSize: MainAxisSize.min,
             children: [
               IconButton(
-                icon: const Icon(Icons.add, size: 20),
+                icon: const Icon(Icons.add_rounded, size: 20),
                 tooltip: '在该分组下新建任务',
                 onPressed: () =>
                     showRoutineDialog(context, ref, presetGroupId: group.id),
               ),
               IconButton(
-                icon: const Icon(Icons.more_vert, size: 20),
+                icon: const Icon(Icons.more_vert_rounded, size: 20),
                 tooltip: '分组操作',
                 onPressed: () => showGroupMenu(context, ref, group),
               ),
@@ -173,26 +194,35 @@ class _RoutineListViewState extends ConsumerState<RoutineListView> {
   }
 
   /// 单个规律事项行
-  Widget _routineTile(BuildContext context, Routine r, RoutineNotifier notifier) {
+  Widget _routineTile(
+      BuildContext context, Routine r, RoutineNotifier notifier) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final cs = Theme.of(context).colorScheme;
     final status = routineStatus(r);
     final color = switch (status) {
-      RoutineStatus.overdue => Colors.red,
-      RoutineStatus.dueSoon => Colors.orange,
-      RoutineStatus.normal => Theme.of(context).colorScheme.primary,
+      RoutineStatus.overdue => AppColors.overdue,
+      RoutineStatus.dueSoon => AppColors.dueSoon,
+      RoutineStatus.normal => isDark ? AppColors.darkPrimary : AppColors.primary,
     };
     final interval = intervalLabel(r.intervalDays);
-    final lead = r.warnLeadDays != 7 ? ' · ${remindLeadLabel(r.warnLeadDays)}提醒' : '';
+    final lead = r.warnLeadDays != 7
+        ? ' · ${remindLeadLabel(r.warnLeadDays)}提醒'
+        : '';
 
     final subtitle = r.isPaused
         ? '已暂停 · $interval · 原为${nextDueLabel(r)}'
         : '$interval$lead · 下次 ${dateShort(r.nextDue)}（${nextDueLabel(r)}）';
 
     return ListTile(
-      contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 2),
-      // 标记完成：核心"自动重置"动作
+      contentPadding:
+          const EdgeInsets.symmetric(horizontal: AppSpacing.lg, vertical: 2),
       leading: IconButton(
-        icon: Icon(r.isPaused ? Icons.pause_circle_outline : Icons.check_circle_outline,
-            color: r.isPaused ? Colors.grey : color),
+        icon: Icon(
+          r.isPaused
+              ? Icons.pause_circle_outline_rounded
+              : Icons.check_circle_outline_rounded,
+          color: r.isPaused ? AppColors.paused : color,
+        ),
         tooltip: r.isPaused ? '恢复（点击行首继续参与提醒）' : '标记完成，自动重新计时',
         onPressed: () {
           if (r.isPaused) {
@@ -210,15 +240,17 @@ class _RoutineListViewState extends ConsumerState<RoutineListView> {
       ),
       title: Text(
         r.title,
-        style: TextStyle(
-          color: r.isPaused ? Colors.grey : null,
+        style: AppTypography.titleMedium(isDark).copyWith(
+          color: r.isPaused
+              ? (isDark ? AppColors.darkTextSecondary : AppColors.textTertiary)
+              : null,
           fontWeight: switch (status) {
-            RoutineStatus.overdue => FontWeight.w600,
-            _ => FontWeight.normal,
+            RoutineStatus.overdue => FontWeight.w700,
+            _ => FontWeight.w500,
           },
         ),
       ),
-      subtitle: Text(subtitle),
+      subtitle: Text(subtitle, style: AppTypography.bodyMedium(isDark)),
       trailing: PopupMenuButton<String>(
         onSelected: (value) {
           switch (value) {
@@ -233,7 +265,7 @@ class _RoutineListViewState extends ConsumerState<RoutineListView> {
           }
         },
         itemBuilder: (context) => [
-          PopupMenuItem(
+          const PopupMenuItem(
             value: 'complete',
             child: Text('标记完成（自动重计时）'),
           ),
